@@ -15,7 +15,7 @@ class gettingStarted_app : public sb7::application
 protected:
     void init()
     {
-        static const char title[] = "gettingStarted";
+        static const char title[] = "Assignment 1";
 
         sb7::application::init();
 
@@ -92,7 +92,11 @@ private:
 void gettingStarted_app::startup()
 {
 
-	// Vertex Shader for the spinning cube
+	// Create program for the spinning cube
+	color_vertex_cube_program = glCreateProgram(); //glCreateProgram creates an empty program object and returns a non-zero value by which it can be referenced. A program object is an object to which shader objects can be attached.
+
+    #pragma region Vertex Shader
+	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
 	static const char * vs_source[] =
 	{
 		"#version 410 core                                                  \n"
@@ -120,8 +124,15 @@ void gettingStarted_app::startup()
 		"    gl_Position = proj_matrix * P;								    \n"
 		"}                                                                  \n"
 	};
+	glShaderSource(vs, 1, vs_source, NULL);
+	glCompileShader(vs);
+	GLint success = 0;
+	glGetShaderiv(vs, GL_COMPILE_STATUS, &success);
+	assert(success != GL_FALSE);
+    #pragma endregion
 
-	// Fragment Shader for the spinning cube
+    #pragma region Fragment Shader
+	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
 	static const char * fs_source[] =
 	{
 		"#version 410 core                                                  \n"
@@ -138,35 +149,26 @@ void gettingStarted_app::startup()
 		"    color = fs_in.color;                                           \n"
 		"}                                                                  \n"
 	};
-
-	// Create program for the spinning cube
-	color_vertex_cube_program = glCreateProgram(); //glCreateProgram creates an empty program object and returns a non-zero value by which it can be referenced. A program object is an object to which shader objects can be attached.
-
-	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vs, 1, vs_source, NULL);
-	glCompileShader(vs);
-	GLint success = 0;
-	glGetShaderiv(vs, GL_COMPILE_STATUS, &success);
-	assert(success != GL_FALSE);
-
-	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fs, 1, fs_source, NULL);
 	glCompileShader(fs);
     success = 0;
 	glGetShaderiv(fs, GL_COMPILE_STATUS, &success);
 	assert(success != GL_FALSE);
+    #pragma endregion
 
+    #pragma region Attach Shaders To Program
 	glAttachShader(color_vertex_cube_program, vs);
 	glAttachShader(color_vertex_cube_program, fs);
+    #pragma endregion
 
-	glLinkProgram(color_vertex_cube_program);
+	glLinkProgram(color_vertex_cube_program); //glLinkProgram links the program object specified by program.
 	success = 0;
-	glGetProgramiv(color_vertex_cube_program, GL_LINK_STATUS, &success);
+	glGetProgramiv(color_vertex_cube_program, GL_LINK_STATUS, &success); //glGetProgramiv returns in params the value of a parameter for a specific program object.
 	assert(success != GL_FALSE);
-	glUseProgram(color_vertex_cube_program);
+	glUseProgram(color_vertex_cube_program); // installs the program object specified by program as part of current rendering state.
 
-	glGenVertexArrays(1, &vao2);
-	glBindVertexArray(vao2);
+	glGenVertexArrays(1, &vao2);  //glGenVertexArrays(n, &array) returns n vertex array object names in arrays
+	glBindVertexArray(vao2); //glBindVertexArray(array) binds the vertex array object with name array.
 
 	// Vertex Data for spinning cube
 	static const GLfloat vertex_data[] =
