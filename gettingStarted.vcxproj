@@ -22,7 +22,7 @@
     <ProjectGUID>{C67B45A1-6560-3AAD-971B-D2AEAC3CEE5C}</ProjectGUID>
     <Keyword>Win32Proj</Keyword>
     <Platform>Win32</Platform>
-    <ProjectName>Assignment1_JonathanSanderson</ProjectName>
+    <ProjectName>Assignment1</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -267,7 +267,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\GettingStarted\gettingStarted.cpp" />
+    <ClCompile Include="src\GettingStarted\Assignment1.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
