@@ -35,13 +35,8 @@ protected:
 
 	vmath::vec3 getArcballVector(int x, int y);
 
-
-
-
 	GLuint			color_vertex_cube_program;
 
-
-   
 	//Where uniforms are defined
     struct uniforms_block
     {
@@ -52,7 +47,6 @@ protected:
 
     GLuint          uniforms_buffer;
 
-  
 
 	// Variables for mouse interaction
     bool bPerVertex;
@@ -63,8 +57,6 @@ protected:
 
 	int iWidth = info.windowWidth;
 	int iHeight = info.windowHeight;
-
-	
 
 	// Rotation and Translation matricies for moving the camera by mouse interaction.
 	vmath::mat4 rotationMatrix = vmath::mat4::identity();
@@ -260,14 +252,17 @@ void assignment1_app::startup()
 
 void assignment1_app::render(double currentTime)
 {
+    #pragma region Colors
     static const GLfloat zeros[] = { 0.0f, 0.0f, 0.0f, 0.0f };
     static const GLfloat gray[] = { 0.1f, 0.1f, 0.1f, 0.0f };
 	static const GLfloat green[] = { 0.0f, 0.25f, 0.0f, 1.0f };
 	static const GLfloat skyBlue[] = { 0.529f, 0.808f, 0.922f };
     static const GLfloat ones[] = { 1.0f };
+    #pragma endregion
+
     const float f = (float)currentTime;
 	
-	// Calculations for mouse interaction camera rotation and translation matrix
+    #pragma region Calculations for mouse interaction camera rotation and translation matrix
 	float fAngle = 0.0f;
 	vmath::vec3 axis_in_camera_coord = (0.0f, 1.0f, 0.0f);	
 	if (iCurMouseX != iPrevMouseX || iCurMouseY != iPrevMouseY) {
@@ -305,7 +300,7 @@ void assignment1_app::render(double currentTime)
 			translationMatrix = vmath::translate(fXpos / (info.windowWidth / fZpos), -fYpos/(info.windowWidth / fZpos), 0.0f);
 		}
 	}
-
+    #pragma endregion
 
     glViewport(0, 0, info.windowWidth, info.windowHeight);
 
@@ -323,11 +318,6 @@ void assignment1_app::render(double currentTime)
 
 	vmath::mat4 perspective_matrix = vmath::perspective(50.0f, (float)info.windowWidth / (float)info.windowHeight, 0.1f, 1000.0f);
 
-
-
-	
-
-
 	// Render cube
 	
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
@@ -342,17 +332,15 @@ void assignment1_app::render(double currentTime)
 	block->view_matrix = view_matrix;
 	block->proj_matrix = perspective_matrix;
 
-	glUnmapBuffer(GL_UNIFORM_BUFFER);
+	glUnmapBuffer(GL_UNIFORM_BUFFER); //release the mapping of a buffer object's data store into the client's address space
 
-	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-
-	
+	glBindBuffer(GL_ARRAY_BUFFER, buffer); 
+	glEnableVertexAttribArray(0); //enable or disable a generic vertex attribute array
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
+	glDrawArrays(GL_TRIANGLES, 0, 36); //void glDrawArrays(GLenum mode, GLint first, GLsizei count); specifies multiple geometric primitives with very few subroutine calls.
 }
 
+#pragma region Event Handlers
 void assignment1_app::onKey(int key, int action)
 {
 	// Check to see if shift was pressed
@@ -380,7 +368,6 @@ void assignment1_app::onKey(int key, int action)
 		bShiftPressed = false;
 	}
 }
-
 
 void assignment1_app::onMouseButton(int button, int action)
 {
@@ -442,7 +429,6 @@ vmath::vec3 assignment1_app::getArcballVector(int x, int y) {
 		vecP = vmath::normalize(vecP);
 	return vecP;
 }
-
-
+#pragma endregion
 
 DECLARE_MAIN(assignment1_app)
