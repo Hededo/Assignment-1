@@ -360,7 +360,9 @@ void assignment1_app::onKey(int key, int action)
 				fYpos = 0.0f;
 				fZpos = 75.0f;
                 break;
-            
+			case 'V':
+				OutputDebugStringW(L"TODO: The ‘v’ key should change between these shading modes (switching shader programs)");
+				break;
 		}
     }
 	// Check to see if shift was released
