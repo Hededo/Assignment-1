@@ -12,6 +12,7 @@
 class assignment1_app : public sb7::application
 {
 
+#pragma region protected
 protected:
     void init()
     {
@@ -61,7 +62,9 @@ protected:
 	// Rotation and Translation matricies for moving the camera by mouse interaction.
 	vmath::mat4 rotationMatrix = vmath::mat4::identity();
 	vmath::mat4 translationMatrix = vmath::mat4::identity();
+#pragma endregion
 
+#pragma region private
 private:
 	// Variables for mouse position to solve the arcball vectors
 	int iPrevMouseX = 0;
@@ -79,6 +82,7 @@ private:
 
 	GLuint buffer;
 	GLuint vao2;
+#pragma endregion
 };
 
 void assignment1_app::startup()
@@ -168,7 +172,7 @@ void assignment1_app::startup()
 	static const GLfloat vertex_data[] =
 	{
 
-		// Cube
+		// Cube #1
 		//B
 		-1.0f, 1.0f, -1.0f, 1.0f,
 		-1.0f, -1.0f, -1.0f, 1.0f,
@@ -222,7 +226,54 @@ void assignment1_app::startup()
 		1.0f, 1.0f, 1.0f, 1.0f,
 		-1.0f, 1.0f, 1.0f, 1.0f,
 		-1.0f, 1.0f, -1.0f, 1.0f,
+		//End Cube
 
+		// Room
+		//B
+		-3.0f, 3.0f, -3.0f, 1.0f,
+		-3.0f, -3.0f, -3.0f, 1.0f,
+		3.0f, -3.0f, -3.0f, 1.0f,
+
+		3.0f, -3.0f, -3.0f, 1.0f,
+		3.0f, 3.0f, -3.0f, 1.0f,
+		-3.0f, 3.0f, -3.0f, 1.0f,
+
+		//R
+		3.0f, -3.0f, -3.0f, 1.0f,
+		3.0f, -3.0f, 3.0f, 1.0f,
+		3.0f, 3.0f, -3.0f, 1.0f,
+
+		3.0f, -3.0f, 3.0f, 1.0f,
+		3.0f, 3.0f, 3.0f, 1.0f,
+		3.0f, 3.0f, -3.0f, 1.0f,
+
+		//L
+		-3.0f, -3.0f, 3.0f, 1.0f,
+		-3.0f, -3.0f, -3.0f, 1.0f,
+		-3.0f, 3.0f, 3.0f, 1.0f,
+
+		-3.0f, -3.0f, -3.0f, 1.0f,
+		-3.0f, 3.0f, -3.0f, 1.0f,
+		-3.0f, 3.0f, 3.0f, 1.0f,
+
+		//D
+		-3.0f, -3.0f, 3.0f, 1.0f,
+		3.0f, -3.0f, 3.0f, 1.0f,
+		3.0f, -3.0f, -3.0f, 1.0f,
+
+		3.0f, -3.0f, -3.0f, 1.0f,
+		-3.0f, -3.0f, -3.0f, 1.0f,
+		-3.0f, -3.0f, 3.0f, 1.0f,
+
+		//U
+		-3.0f, 3.0f, -3.0f, 1.0f,
+		3.0f, 3.0f, -3.0f, 1.0f,
+		3.0f, 3.0f, 3.0f, 1.0f,
+
+		3.0f, 3.0f, 3.0f, 1.0f,
+		-3.0f, 3.0f, 3.0f, 1.0f,
+		-3.0f, 3.0f, -3.0f, 1.0f,
+		//End Room
 		
 	};
     #pragma endregion
@@ -337,7 +388,12 @@ void assignment1_app::render(double currentTime)
 	glBindBuffer(GL_ARRAY_BUFFER, buffer); 
 	glEnableVertexAttribArray(0); //enable or disable a generic vertex attribute array
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
-	glDrawArrays(GL_TRIANGLES, 0, 36); //void glDrawArrays(GLenum mode, GLint first, GLsizei count); specifies multiple geometric primitives with very few subroutine calls.
+	glDrawArrays(GL_TRIANGLES, 0, 66); //void glDrawArrays(GLenum mode, GLint first, GLsizei count); specifies multiple geometric primitives with very few subroutine calls.
+}
+
+GLfloat ReturnARandomColor() 
+{
+	return (GLfloat) 0.0f;
 }
 
 #pragma region Event Handlers
@@ -361,7 +417,8 @@ void assignment1_app::onKey(int key, int action)
 				fZpos = 75.0f;
                 break;
 			case 'V':
-				OutputDebugStringW(L"TODO: The ‘v’ key should change between these shading modes (switching shader programs)");
+
+				//TODO: The ‘v’ key should change between these shading modes (switching shader programs).
 				break;
 		}
     }
