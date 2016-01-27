@@ -9,7 +9,7 @@
 
 #define PI 3.14159265
 
-class gettingStarted_app : public sb7::application
+class assignment1_app : public sb7::application
 {
 
 protected:
@@ -89,7 +89,7 @@ private:
 	GLuint vao2;
 };
 
-void gettingStarted_app::startup()
+void assignment1_app::startup()
 {
 
 	// Create program for the spinning cube
@@ -161,16 +161,18 @@ void gettingStarted_app::startup()
 	glAttachShader(color_vertex_cube_program, fs);
     #pragma endregion
 
+    #pragma region Link And Use Program
 	glLinkProgram(color_vertex_cube_program); //glLinkProgram links the program object specified by program.
 	success = 0;
 	glGetProgramiv(color_vertex_cube_program, GL_LINK_STATUS, &success); //glGetProgramiv returns in params the value of a parameter for a specific program object.
 	assert(success != GL_FALSE);
 	glUseProgram(color_vertex_cube_program); // installs the program object specified by program as part of current rendering state.
+    #pragma endregion
 
 	glGenVertexArrays(1, &vao2);  //glGenVertexArrays(n, &array) returns n vertex array object names in arrays
 	glBindVertexArray(vao2); //glBindVertexArray(array) binds the vertex array object with name array.
 
-	// Vertex Data for spinning cube
+    #pragma region Vertex Data
 	static const GLfloat vertex_data[] =
 	{
 
@@ -231,8 +233,9 @@ void gettingStarted_app::startup()
 
 		
 	};
+    #pragma endregion
 
-	// Buffer for spinning Cube
+    #pragma region Buffer
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
 	glBufferData(GL_ARRAY_BUFFER,
@@ -240,21 +243,22 @@ void gettingStarted_app::startup()
 		vertex_data,
 		GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-
-
+   #pragma endregion
 	
-	// Buffer for uniform block
+    #pragma region Buffer For Uniform Block
 	glGenBuffers(1, &uniforms_buffer);
     glBindBuffer(GL_UNIFORM_BUFFER, uniforms_buffer);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(uniforms_block), NULL, GL_DYNAMIC_DRAW);
+    #pragma endregion
 
-	glFrontFace(GL_CW);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);	
+    #pragma region OPENGL Settings
+	glFrontFace(GL_CW); //glFrontFace(GLenum mode) In a scene composed entirely of opaque closed surfaces, back-facing polygons are never visible.
+    glEnable(GL_DEPTH_TEST); //glEnable(GLenum cap) glEnable and glDisable enable and disable various capabilities.
+    glDepthFunc(GL_LEQUAL);	//glDepthFunc(GLenum func) specifies the function used to compare each incoming pixel depth value with the depth value present in the depth buffer. 
+    #pragma endregion
 }
 
-void gettingStarted_app::render(double currentTime)
+void assignment1_app::render(double currentTime)
 {
     static const GLfloat zeros[] = { 0.0f, 0.0f, 0.0f, 0.0f };
     static const GLfloat gray[] = { 0.1f, 0.1f, 0.1f, 0.0f };
@@ -349,7 +353,7 @@ void gettingStarted_app::render(double currentTime)
 	
 }
 
-void gettingStarted_app::onKey(int key, int action)
+void assignment1_app::onKey(int key, int action)
 {
 	// Check to see if shift was pressed
 	if (action == GLFW_PRESS && (key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT))
@@ -378,7 +382,7 @@ void gettingStarted_app::onKey(int key, int action)
 }
 
 
-void gettingStarted_app::onMouseButton(int button, int action)
+void assignment1_app::onMouseButton(int button, int action)
 {
 	int x, y;
 	
@@ -412,7 +416,7 @@ void gettingStarted_app::onMouseButton(int button, int action)
 	
 }
 
-void gettingStarted_app::onMouseMove(int x, int y)
+void assignment1_app::onMouseMove(int x, int y)
 {
 	// If rotating, zooming, or panning save mouse x and y
 	if (bRotate || bZoom || bPan) 
@@ -425,7 +429,7 @@ void gettingStarted_app::onMouseMove(int x, int y)
 // Modified from tutorial at the following website:
 // http://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_Arcball
 
-vmath::vec3 gettingStarted_app::getArcballVector(int x, int y) {
+vmath::vec3 assignment1_app::getArcballVector(int x, int y) {
 	// find vector from origin to point on sphere
 	vmath::vec3 vecP = vmath::vec3(1.0f*x / info.windowWidth * 2 - 1.0f, 1.0f*y / info.windowHeight * 2 - 1.0f, 0.0f);
 	// inverse y due to difference in origin location on the screen
@@ -441,4 +445,4 @@ vmath::vec3 gettingStarted_app::getArcballVector(int x, int y) {
 
 
 
-DECLARE_MAIN(gettingStarted_app)
+DECLARE_MAIN(assignment1_app)
