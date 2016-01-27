@@ -62,6 +62,15 @@ protected:
 	// Rotation and Translation matricies for moving the camera by mouse interaction.
 	vmath::mat4 rotationMatrix = vmath::mat4::identity();
 	vmath::mat4 translationMatrix = vmath::mat4::identity();
+
+    #pragma region Colors
+	GLfloat zeros[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	GLfloat gray[4] = { 0.1f, 0.1f, 0.1f, 0.0f };
+	GLfloat green[4] = { 0.0f, 0.25f, 0.0f, 1.0f };
+	GLfloat skyBlue[4] = { 0.529f, 0.808f, 0.922f, 1.0f };
+	GLfloat ones[4] = { 1.0f, 1.0f, 1.0f, 1.0f};
+    #pragma endregion
+
 #pragma endregion
 
 #pragma region private
@@ -303,14 +312,6 @@ void assignment1_app::startup()
 
 void assignment1_app::render(double currentTime)
 {
-    #pragma region Colors
-    static const GLfloat zeros[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-    static const GLfloat gray[] = { 0.1f, 0.1f, 0.1f, 0.0f };
-	static const GLfloat green[] = { 0.0f, 0.25f, 0.0f, 1.0f };
-	static const GLfloat skyBlue[] = { 0.529f, 0.808f, 0.922f };
-    static const GLfloat ones[] = { 1.0f };
-    #pragma endregion
-
     const float f = (float)currentTime;
 	
     #pragma region Calculations for mouse interaction camera rotation and translation matrix
