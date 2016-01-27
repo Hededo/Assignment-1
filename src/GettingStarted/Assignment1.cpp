@@ -64,12 +64,123 @@ protected:
 	vmath::mat4 translationMatrix = vmath::mat4::identity();
 
     #pragma region Colors
-	GLfloat zeros[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	GLfloat gray[4] = { 0.1f, 0.1f, 0.1f, 0.0f };
-	GLfloat green[4] = { 0.0f, 0.25f, 0.0f, 1.0f };
-	GLfloat skyBlue[4] = { 0.529f, 0.808f, 0.922f, 1.0f };
-	GLfloat ones[4] = { 1.0f, 1.0f, 1.0f, 1.0f};
+    const GLfloat zeros[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	const GLfloat gray[4] = { 0.1f, 0.1f, 0.1f, 0.0f };
+	const GLfloat green[4] = { 0.0f, 0.25f, 0.0f, 1.0f };
+	const GLfloat skyBlue[4] = { 0.529f, 0.808f, 0.922f, 1.0f };
+	const GLfloat ones[4] = { 1.0f, 1.0f, 1.0f, 1.0f};
     #pragma endregion
+
+#pragma region Vertex Data
+    static const int numberOfVertices = 66;
+	static const int numberOfVerticeComponents = numberOfVertices * 4;
+    const GLfloat vertex_data[numberOfVerticeComponents] =
+	{
+		// Cube #1
+		//B
+		-1.0f, 1.0f, -1.0f, 1.0f,
+		-1.0f, -1.0f, -1.0f, 1.0f,
+		1.0f, -1.0f, -1.0f, 1.0f,
+
+		1.0f, -1.0f, -1.0f, 1.0f,
+		1.0f, 1.0f, -1.0f, 1.0f,
+		-1.0f, 1.0f, -1.0f, 1.0f,
+
+		//R
+		1.0f, -1.0f, -1.0f, 1.0f,
+		1.0f, -1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, -1.0f, 1.0f,
+
+		1.0f, -1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, -1.0f, 1.0f,
+
+		//F
+		1.0f, -1.0f, 1.0f, 1.0f,
+		-1.0f, -1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+
+		-1.0f, -1.0f, 1.0f, 1.0f,
+		-1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+
+		//L
+		-1.0f, -1.0f, 1.0f, 1.0f,
+		-1.0f, -1.0f, -1.0f, 1.0f,
+		-1.0f, 1.0f, 1.0f, 1.0f,
+
+		-1.0f, -1.0f, -1.0f, 1.0f,
+		-1.0f, 1.0f, -1.0f, 1.0f,
+		-1.0f, 1.0f, 1.0f, 1.0f,
+
+		//D
+		-1.0f, -1.0f, 1.0f, 1.0f,
+		1.0f, -1.0f, 1.0f, 1.0f,
+		1.0f, -1.0f, -1.0f, 1.0f,
+
+		1.0f, -1.0f, -1.0f, 1.0f,
+		-1.0f, -1.0f, -1.0f, 1.0f,
+		-1.0f, -1.0f, 1.0f, 1.0f,
+
+		//U
+		-1.0f, 1.0f, -1.0f, 1.0f,
+		1.0f, 1.0f, -1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+
+		1.0f, 1.0f, 1.0f, 1.0f,
+		-1.0f, 1.0f, 1.0f, 1.0f,
+		-1.0f, 1.0f, -1.0f, 1.0f,
+		//End Cube
+
+		// Room
+		//B
+		-3.0f, 3.0f, -3.0f, 1.0f,
+		-3.0f, -3.0f, -3.0f, 1.0f,
+		3.0f, -3.0f, -3.0f, 1.0f,
+
+		3.0f, -3.0f, -3.0f, 1.0f,
+		3.0f, 3.0f, -3.0f, 1.0f,
+		-3.0f, 3.0f, -3.0f, 1.0f,
+
+		//R
+		3.0f, -3.0f, -3.0f, 1.0f,
+		3.0f, -3.0f, 3.0f, 1.0f,
+		3.0f, 3.0f, -3.0f, 1.0f,
+
+		3.0f, -3.0f, 3.0f, 1.0f,
+		3.0f, 3.0f, 3.0f, 1.0f,
+		3.0f, 3.0f, -3.0f, 1.0f,
+
+		//L
+		-3.0f, -3.0f, 3.0f, 1.0f,
+		-3.0f, -3.0f, -3.0f, 1.0f,
+		-3.0f, 3.0f, 3.0f, 1.0f,
+
+		-3.0f, -3.0f, -3.0f, 1.0f,
+		-3.0f, 3.0f, -3.0f, 1.0f,
+		-3.0f, 3.0f, 3.0f, 1.0f,
+
+		//D
+		-3.0f, -3.0f, 3.0f, 1.0f,
+		3.0f, -3.0f, 3.0f, 1.0f,
+		3.0f, -3.0f, -3.0f, 1.0f,
+
+		3.0f, -3.0f, -3.0f, 1.0f,
+		-3.0f, -3.0f, -3.0f, 1.0f,
+		-3.0f, -3.0f, 3.0f, 1.0f,
+
+		//U
+		-3.0f, 3.0f, -3.0f, 1.0f,
+		3.0f, 3.0f, -3.0f, 1.0f,
+		3.0f, 3.0f, 3.0f, 1.0f,
+
+		3.0f, 3.0f, 3.0f, 1.0f,
+		-3.0f, 3.0f, 3.0f, 1.0f,
+		-3.0f, 3.0f, -3.0f, 1.0f,
+		//End Room
+
+	};
+#pragma endregion
 
 #pragma endregion
 
@@ -177,116 +288,6 @@ void assignment1_app::startup()
 	glGenVertexArrays(1, &vao2);  //glGenVertexArrays(n, &array) returns n vertex array object names in arrays
 	glBindVertexArray(vao2); //glBindVertexArray(array) binds the vertex array object with name array.
 
-    #pragma region Vertex Data
-	static const GLfloat vertex_data[] =
-	{
-
-		// Cube #1
-		//B
-		-1.0f, 1.0f, -1.0f, 1.0f,
-		-1.0f, -1.0f, -1.0f, 1.0f,
-		1.0f, -1.0f, -1.0f, 1.0f,
-
-		1.0f, -1.0f, -1.0f, 1.0f,
-		1.0f, 1.0f, -1.0f, 1.0f,
-		-1.0f, 1.0f, -1.0f, 1.0f,
-
-		//R
-		1.0f, -1.0f, -1.0f, 1.0f,
-		1.0f, -1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, -1.0f, 1.0f,
-
-		1.0f, -1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, -1.0f, 1.0f,
-
-		//F
-		1.0f, -1.0f, 1.0f, 1.0f,
-		-1.0f, -1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f, 1.0f,
-
-		-1.0f, -1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f, 1.0f,
-
-		//L
-		-1.0f, -1.0f, 1.0f, 1.0f,
-		-1.0f, -1.0f, -1.0f, 1.0f,
-		-1.0f, 1.0f, 1.0f, 1.0f,
-
-		-1.0f, -1.0f, -1.0f, 1.0f,
-		-1.0f, 1.0f, -1.0f, 1.0f,
-		-1.0f, 1.0f, 1.0f, 1.0f,
-
-		//D
-		-1.0f, -1.0f, 1.0f, 1.0f,
-		1.0f, -1.0f, 1.0f, 1.0f,
-		1.0f, -1.0f, -1.0f, 1.0f,
-
-		1.0f, -1.0f, -1.0f, 1.0f,
-		-1.0f, -1.0f, -1.0f, 1.0f,
-		-1.0f, -1.0f, 1.0f, 1.0f,
-
-		//U
-		-1.0f, 1.0f, -1.0f, 1.0f,
-		1.0f, 1.0f, -1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f, 1.0f,
-
-		1.0f, 1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f, -1.0f, 1.0f,
-		//End Cube
-
-		// Room
-		//B
-		-3.0f, 3.0f, -3.0f, 1.0f,
-		-3.0f, -3.0f, -3.0f, 1.0f,
-		3.0f, -3.0f, -3.0f, 1.0f,
-
-		3.0f, -3.0f, -3.0f, 1.0f,
-		3.0f, 3.0f, -3.0f, 1.0f,
-		-3.0f, 3.0f, -3.0f, 1.0f,
-
-		//R
-		3.0f, -3.0f, -3.0f, 1.0f,
-		3.0f, -3.0f, 3.0f, 1.0f,
-		3.0f, 3.0f, -3.0f, 1.0f,
-
-		3.0f, -3.0f, 3.0f, 1.0f,
-		3.0f, 3.0f, 3.0f, 1.0f,
-		3.0f, 3.0f, -3.0f, 1.0f,
-
-		//L
-		-3.0f, -3.0f, 3.0f, 1.0f,
-		-3.0f, -3.0f, -3.0f, 1.0f,
-		-3.0f, 3.0f, 3.0f, 1.0f,
-
-		-3.0f, -3.0f, -3.0f, 1.0f,
-		-3.0f, 3.0f, -3.0f, 1.0f,
-		-3.0f, 3.0f, 3.0f, 1.0f,
-
-		//D
-		-3.0f, -3.0f, 3.0f, 1.0f,
-		3.0f, -3.0f, 3.0f, 1.0f,
-		3.0f, -3.0f, -3.0f, 1.0f,
-
-		3.0f, -3.0f, -3.0f, 1.0f,
-		-3.0f, -3.0f, -3.0f, 1.0f,
-		-3.0f, -3.0f, 3.0f, 1.0f,
-
-		//U
-		-3.0f, 3.0f, -3.0f, 1.0f,
-		3.0f, 3.0f, -3.0f, 1.0f,
-		3.0f, 3.0f, 3.0f, 1.0f,
-
-		3.0f, 3.0f, 3.0f, 1.0f,
-		-3.0f, 3.0f, 3.0f, 1.0f,
-		-3.0f, 3.0f, -3.0f, 1.0f,
-		//End Room
-		
-	};
-    #pragma endregion
-
     #pragma region Buffer
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -389,7 +390,7 @@ void assignment1_app::render(double currentTime)
 	glBindBuffer(GL_ARRAY_BUFFER, buffer); 
 	glEnableVertexAttribArray(0); //enable or disable a generic vertex attribute array
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
-	glDrawArrays(GL_TRIANGLES, 0, 66); //void glDrawArrays(GLenum mode, GLint first, GLsizei count); specifies multiple geometric primitives with very few subroutine calls.
+	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices); //void glDrawArrays(GLenum mode, GLint first, GLsizei count); specifies multiple geometric primitives with very few subroutine calls.
 }
 
 GLfloat ReturnARandomColor() 
