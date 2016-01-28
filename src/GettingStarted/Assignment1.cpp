@@ -245,8 +245,10 @@ private:
 void assignment1_app::startup()
 {
 
+	load_shaders();
+
 	// Create program for the spinning cube
-	per_vertex_program = glCreateProgram(); //glCreateProgram creates an empty program object and returns a non-zero value by which it can be referenced. A program object is an object to which shader objects can be attached.
+	per_fragment_program = glCreateProgram(); //glCreateProgram creates an empty program object and returns a non-zero value by which it can be referenced. A program object is an object to which shader objects can be attached.
 
     #pragma region Vertex Shader
 	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
@@ -310,16 +312,16 @@ void assignment1_app::startup()
     #pragma endregion
 
     #pragma region Attach Shaders To Program
-	glAttachShader(per_vertex_program, vs);
-	glAttachShader(per_vertex_program, fs);
+	glAttachShader(per_fragment_program, vs);
+	glAttachShader(per_fragment_program, fs);
     #pragma endregion
 
     #pragma region Link And Use Program
-	glLinkProgram(per_vertex_program); //glLinkProgram links the program object specified by program.
+	glLinkProgram(per_fragment_program); //glLinkProgram links the program object specified by program.
 	success = 0;
-	glGetProgramiv(per_vertex_program, GL_LINK_STATUS, &success); //glGetProgramiv returns in params the value of a parameter for a specific program object.
+	glGetProgramiv(per_fragment_program, GL_LINK_STATUS, &success); //glGetProgramiv returns in params the value of a parameter for a specific program object.
 	assert(success != GL_FALSE);
-	glUseProgram(per_vertex_program); // installs the program object specified by program as part of current rendering state.
+	glUseProgram(per_fragment_program); // installs the program object specified by program as part of current rendering state.
     #pragma endregion
 
 	glGenVertexArrays(1, &vao2);  //glGenVertexArrays(n, &array) returns n vertex array object names in arrays
@@ -356,6 +358,7 @@ void assignment1_app::startup()
 void assignment1_app::render(double currentTime)
 {
     const float f = (float)currentTime;
+	glUseProgram(per_vertex ? per_vertex_program : per_fragment_program);
 	
     #pragma region Calculations for mouse interaction camera rotation and translation matrix
 	float fAngle = 0.0f;
