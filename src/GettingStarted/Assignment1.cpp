@@ -12,6 +12,14 @@
 class assignment1_app : public sb7::application
 {
 
+public:
+	assignment1_app()
+		: per_fragment_program(0),
+		per_vertex_program(0),
+		per_vertex(false)
+	{
+	}
+
 #pragma region protected
 protected:
     void init()
@@ -36,7 +44,16 @@ protected:
 
 	vmath::vec3 getArcballVector(int x, int y);
 
-	GLuint			color_vertex_cube_program;
+	void load_shaders();
+
+	GLuint          per_fragment_program;
+	GLuint          per_vertex_program;
+
+	struct
+	{
+		GLuint      color;
+		GLuint      normals;
+	} textures;
 
 	//Where uniforms are defined
     struct uniforms_block
@@ -47,6 +64,17 @@ protected:
     };
 
     GLuint          uniforms_buffer;
+
+	struct
+	{
+		GLint           diffuse_albedo;
+		GLint           specular_albedo;
+		GLint           specular_power;
+	} uniforms[2];
+
+	sb7::object     object;
+
+	bool            per_vertex;
 
 
 	// Variables for mouse interaction
@@ -218,7 +246,7 @@ void assignment1_app::startup()
 {
 
 	// Create program for the spinning cube
-	color_vertex_cube_program = glCreateProgram(); //glCreateProgram creates an empty program object and returns a non-zero value by which it can be referenced. A program object is an object to which shader objects can be attached.
+	per_vertex_program = glCreateProgram(); //glCreateProgram creates an empty program object and returns a non-zero value by which it can be referenced. A program object is an object to which shader objects can be attached.
 
     #pragma region Vertex Shader
 	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
@@ -282,16 +310,16 @@ void assignment1_app::startup()
     #pragma endregion
 
     #pragma region Attach Shaders To Program
-	glAttachShader(color_vertex_cube_program, vs);
-	glAttachShader(color_vertex_cube_program, fs);
+	glAttachShader(per_vertex_program, vs);
+	glAttachShader(per_vertex_program, fs);
     #pragma endregion
 
     #pragma region Link And Use Program
-	glLinkProgram(color_vertex_cube_program); //glLinkProgram links the program object specified by program.
+	glLinkProgram(per_vertex_program); //glLinkProgram links the program object specified by program.
 	success = 0;
-	glGetProgramiv(color_vertex_cube_program, GL_LINK_STATUS, &success); //glGetProgramiv returns in params the value of a parameter for a specific program object.
+	glGetProgramiv(per_vertex_program, GL_LINK_STATUS, &success); //glGetProgramiv returns in params the value of a parameter for a specific program object.
 	assert(success != GL_FALSE);
-	glUseProgram(color_vertex_cube_program); // installs the program object specified by program as part of current rendering state.
+	glUseProgram(per_vertex_program); // installs the program object specified by program as part of current rendering state.
     #pragma endregion
 
 	glGenVertexArrays(1, &vao2);  //glGenVertexArrays(n, &array) returns n vertex array object names in arrays
@@ -407,9 +435,40 @@ void assignment1_app::render(double currentTime)
 	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices); //void glDrawArrays(GLenum mode, GLint first, GLsizei count); specifies multiple geometric primitives with very few subroutine calls.
 }
 
-GLfloat ReturnARandomColor() 
+void assignment1_app::load_shaders()
 {
-	return (GLfloat) 0.0f;
+	//GLuint vs;
+	//GLuint fs;
+
+	//vs = sb7::shader::load("media/shaders/phonglighting/per-fragment-phong.vs.glsl", GL_VERTEX_SHADER);
+	//fs = sb7::shader::load("media/shaders/phonglighting/per-fragment-phong.fs.glsl", GL_FRAGMENT_SHADER);
+
+	//if (per_fragment_program)
+	//	glDeleteProgram(per_fragment_program);
+
+	//per_fragment_program = glCreateProgram();
+	//glAttachShader(per_fragment_program, vs);
+	//glAttachShader(per_fragment_program, fs);
+	//glLinkProgram(per_fragment_program);
+
+	//uniforms[0].diffuse_albedo = glGetUniformLocation(per_fragment_program, "diffuse_albedo");
+	//uniforms[0].specular_albedo = glGetUniformLocation(per_fragment_program, "specular_albedo");
+	//uniforms[0].specular_power = glGetUniformLocation(per_fragment_program, "specular_power");
+
+	//vs = sb7::shader::load("media/shaders/phonglighting/per-vertex-phong.vs.glsl", GL_VERTEX_SHADER);
+	//fs = sb7::shader::load("media/shaders/phonglighting/per-vertex-phong.fs.glsl", GL_FRAGMENT_SHADER);
+
+	//if (per_vertex_program)
+	//	glDeleteProgram(per_vertex_program);
+
+	//per_vertex_program = glCreateProgram();
+	//glAttachShader(per_vertex_program, vs);
+	//glAttachShader(per_vertex_program, fs);
+	//glLinkProgram(per_vertex_program);
+
+	//uniforms[1].diffuse_albedo = glGetUniformLocation(per_vertex_program, "diffuse_albedo");
+	//uniforms[1].specular_albedo = glGetUniformLocation(per_vertex_program, "specular_albedo");
+	//uniforms[1].specular_power = glGetUniformLocation(per_vertex_program, "specular_power");
 }
 
 #pragma region Event Handlers
@@ -426,6 +485,7 @@ void assignment1_app::onKey(int key, int action)
         {
 			
             case 'R': 
+				load_shaders();
 				rotationMatrix = vmath::mat4::identity();
 				translationMatrix = vmath::mat4::identity();
 				fXpos = 0.0f;
@@ -433,8 +493,7 @@ void assignment1_app::onKey(int key, int action)
 				fZpos = 75.0f;
                 break;
 			case 'V':
-
-				//TODO: The ‘v’ key should change between these shading modes (switching shader programs).
+				per_vertex = !per_vertex;
 				break;
 		}
     }
