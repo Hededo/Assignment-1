@@ -437,38 +437,43 @@ void assignment1_app::render(double currentTime)
 
 void assignment1_app::load_shaders()
 {
-	//GLuint vs;
-	//GLuint fs;
+	GLuint vs;
+	GLuint fs;
 
 	//vs = sb7::shader::load("media/shaders/phonglighting/per-fragment-phong.vs.glsl", GL_VERTEX_SHADER);
 	//fs = sb7::shader::load("media/shaders/phonglighting/per-fragment-phong.fs.glsl", GL_FRAGMENT_SHADER);
 
-	//if (per_fragment_program)
-	//	glDeleteProgram(per_fragment_program);
+	if (per_fragment_program)
+	{
+		glDeleteProgram(per_fragment_program);
+	}
+		
 
-	//per_fragment_program = glCreateProgram();
+	per_fragment_program = glCreateProgram();
 	//glAttachShader(per_fragment_program, vs);
 	//glAttachShader(per_fragment_program, fs);
-	//glLinkProgram(per_fragment_program);
+	glLinkProgram(per_fragment_program);
 
-	//uniforms[0].diffuse_albedo = glGetUniformLocation(per_fragment_program, "diffuse_albedo");
-	//uniforms[0].specular_albedo = glGetUniformLocation(per_fragment_program, "specular_albedo");
-	//uniforms[0].specular_power = glGetUniformLocation(per_fragment_program, "specular_power");
+	uniforms[0].diffuse_albedo = glGetUniformLocation(per_fragment_program, "diffuse_albedo");
+	uniforms[0].specular_albedo = glGetUniformLocation(per_fragment_program, "specular_albedo");
+	uniforms[0].specular_power = glGetUniformLocation(per_fragment_program, "specular_power");
 
 	//vs = sb7::shader::load("media/shaders/phonglighting/per-vertex-phong.vs.glsl", GL_VERTEX_SHADER);
 	//fs = sb7::shader::load("media/shaders/phonglighting/per-vertex-phong.fs.glsl", GL_FRAGMENT_SHADER);
 
-	//if (per_vertex_program)
-	//	glDeleteProgram(per_vertex_program);
+	if (per_vertex_program)
+	{
+		glDeleteProgram(per_vertex_program);
+	}
 
-	//per_vertex_program = glCreateProgram();
+	per_vertex_program = glCreateProgram();
 	//glAttachShader(per_vertex_program, vs);
 	//glAttachShader(per_vertex_program, fs);
-	//glLinkProgram(per_vertex_program);
+	glLinkProgram(per_vertex_program);
 
-	//uniforms[1].diffuse_albedo = glGetUniformLocation(per_vertex_program, "diffuse_albedo");
-	//uniforms[1].specular_albedo = glGetUniformLocation(per_vertex_program, "specular_albedo");
-	//uniforms[1].specular_power = glGetUniformLocation(per_vertex_program, "specular_power");
+	uniforms[1].diffuse_albedo = glGetUniformLocation(per_vertex_program, "diffuse_albedo");
+	uniforms[1].specular_albedo = glGetUniformLocation(per_vertex_program, "specular_albedo");
+	uniforms[1].specular_power = glGetUniformLocation(per_vertex_program, "specular_power");
 }
 
 #pragma region Event Handlers
