@@ -72,7 +72,7 @@ protected:
     #pragma endregion
 
 #pragma region Vertex Data
-    static const int numberOfVertices = 66;
+    static const int numberOfVertices = 72;
 	static const int numberOfVerticeComponents = numberOfVertices * 4;
     const GLfloat vertex_data[numberOfVerticeComponents] =
 	{
@@ -150,6 +150,15 @@ protected:
 		3.0f, -3.0f, 3.0f, 1.0f,
 		3.0f, 3.0f, 3.0f, 1.0f,
 		3.0f, 3.0f, -3.0f, 1.0f,
+
+		//F
+		3.0f, -3.0f, 3.0f, 1.0f,
+		-3.0f, -3.0f, 3.0f, 1.0f,
+		3.0f, 3.0f, 3.0f, 1.0f,
+
+		-3.0f, -3.0f, 3.0f, 1.0f,
+		-3.0f, 3.0f, 3.0f, 1.0f,
+		3.0f, 3.0f, 3.0f, 1.0f,
 
 		//L
 		-3.0f, -3.0f, 3.0f, 1.0f,
@@ -305,6 +314,11 @@ void assignment1_app::startup()
     #pragma endregion
 
     #pragma region OPENGL Settings
+
+    #pragma region Make a room (4-walls, a ceiling and a floor).  Use face culling to see into the room.
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
+   #pragma endregion
 	glFrontFace(GL_CW); //glFrontFace(GLenum mode) In a scene composed entirely of opaque closed surfaces, back-facing polygons are never visible.
     glEnable(GL_DEPTH_TEST); //glEnable(GLenum cap) glEnable and glDisable enable and disable various capabilities.
     glDepthFunc(GL_LEQUAL);	//glDepthFunc(GLenum func) specifies the function used to compare each incoming pixel depth value with the depth value present in the depth buffer. 
