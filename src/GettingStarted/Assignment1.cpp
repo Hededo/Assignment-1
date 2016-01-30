@@ -443,8 +443,8 @@ void assignment1_app::load_shaders()
 	GLuint vs;
 	GLuint fs;
 
-	//vs = sb7::shader::load("media/shaders/phonglighting/per-fragment-phong.vs.glsl", GL_VERTEX_SHADER);
-	//fs = sb7::shader::load("media/shaders/phonglighting/per-fragment-phong.fs.glsl", GL_FRAGMENT_SHADER);
+	vs = sb7::shader::load("media/shaders/phonglighting/per-fragment-phong.vs.glsl", GL_VERTEX_SHADER);
+	fs = sb7::shader::load("media/shaders/phonglighting/per-fragment-phong.fs.glsl", GL_FRAGMENT_SHADER);
 
 	if (per_fragment_program)
 	{
@@ -453,16 +453,16 @@ void assignment1_app::load_shaders()
 		
 
 	per_fragment_program = glCreateProgram();
-	//glAttachShader(per_fragment_program, vs);
-	//glAttachShader(per_fragment_program, fs);
+	glAttachShader(per_fragment_program, vs);
+	glAttachShader(per_fragment_program, fs);
 	glLinkProgram(per_fragment_program);
 
 	uniforms[0].diffuse_albedo = glGetUniformLocation(per_fragment_program, "diffuse_albedo");
 	uniforms[0].specular_albedo = glGetUniformLocation(per_fragment_program, "specular_albedo");
 	uniforms[0].specular_power = glGetUniformLocation(per_fragment_program, "specular_power");
 
-	//vs = sb7::shader::load("media/shaders/phonglighting/per-vertex-phong.vs.glsl", GL_VERTEX_SHADER);
-	//fs = sb7::shader::load("media/shaders/phonglighting/per-vertex-phong.fs.glsl", GL_FRAGMENT_SHADER);
+	vs = sb7::shader::load("media/shaders/phonglighting/per-vertex-phong.vs.glsl", GL_VERTEX_SHADER);
+	fs = sb7::shader::load("media/shaders/phonglighting/per-vertex-phong.fs.glsl", GL_FRAGMENT_SHADER);
 
 	if (per_vertex_program)
 	{
@@ -470,8 +470,8 @@ void assignment1_app::load_shaders()
 	}
 
 	per_vertex_program = glCreateProgram();
-	//glAttachShader(per_vertex_program, vs);
-	//glAttachShader(per_vertex_program, fs);
+	glAttachShader(per_vertex_program, vs);
+	glAttachShader(per_vertex_program, fs);
 	glLinkProgram(per_vertex_program);
 
 	uniforms[1].diffuse_albedo = glGetUniformLocation(per_vertex_program, "diffuse_albedo");
