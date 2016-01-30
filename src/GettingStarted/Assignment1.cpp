@@ -96,12 +96,12 @@ protected:
 
     #pragma region Colors
     const GLfloat zeros[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	const GLfloat gray[4] = { 0.1f, 0.1f, 0.1f, 0.0f };
 	const GLfloat green[4] = { 0.0f, 0.25f, 0.0f, 1.0f };
 	const GLfloat skyBlue[4] = { 0.529f, 0.808f, 0.922f, 1.0f };
 	const GLfloat ones[4] = { 1.0f, 1.0f, 1.0f, 1.0f};
 	const vmath::vec4 orange = vmath::vec4(1.0f, 0.5f, 0.0f, 1.0f);
 	const vmath::vec4 purple = vmath::vec4(1.0f, 0.0f, 1.0f, 1.0f);
+	const vmath::vec4 gray = vmath::vec4(0.8f, 0.8f, 0.8f, 1.0f);
     #pragma endregion
 
 #pragma region Vertex Data
@@ -164,6 +164,63 @@ protected:
 		-1.0f, 1.0f, -1.0f, 1.0f,
 		//End Cube
 	};
+
+	const GLfloat color_data[numberOfVerticeComponents] = { 
+		//B (Green)
+		0.0f,  1.0f,  0.0f, 1.0f,
+		0.0f,  1.0f,  0.0f, 1.0f,
+		0.0f,  1.0f,  0.0f, 1.0f,
+
+		0.0f,  1.0f,  0.0f, 1.0f,
+		0.0f,  1.0f,  0.0f, 1.0f,
+		0.0f,  1.0f,  0.0f, 1.0f,
+
+		//R (Red)
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+
+		//F (Green)
+		0.0f,  1.0f,  0.0f, 1.0f,
+		0.0f,  1.0f,  0.0f, 1.0f,
+		0.0f,  1.0f,  0.0f, 1.0f,
+
+		0.0f,  1.0f,  0.0f, 1.0f,
+		0.0f,  1.0f,  0.0f, 1.0f,
+		0.0f,  1.0f,  0.0f, 1.0f,
+
+		//L (Red)
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+
+		//D (Blue)
+		0.0f, 0.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 1.0f, 1.0f,
+
+		0.0f, 0.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 1.0f, 1.0f,
+
+		//U
+		0.0f, 0.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 1.0f, 1.0f,
+
+		0.0f, 0.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 1.0f, 1.0f,
+		//End Cube
+	};
 #pragma endregion
 
 #pragma endregion
@@ -185,6 +242,7 @@ private:
 	float fZpos = 75.0f;
 
 	GLuint buffer;
+	GLuint colorBuffer;
 	GLuint vao2;
 #pragma endregion
 };
@@ -204,8 +262,10 @@ void assignment1_app::startup()
 	static const char * vs_source[] =
 	{
 		"#version 410 core                                                  \n"
-		"                                                                   \n"
+		"// Per-vertex inputs                                                \n"
 		"layout (location = 0) in vec4 position;                            \n"
+        "layout (location = 1) in vec4 color;                            \n"
+		"layout (location = 2) in vec4 normal;                            \n"
 		"																	\n"
 		"layout(std140) uniform constants									\n"
 		"{																	\n"
@@ -232,9 +292,9 @@ void assignment1_app::startup()
 		"    }                           									\n"
 		"    else									\n"
 		"    {                               								\n"
-		"       vs_out.color = (position+1.5)/2.5;	                           								\n"
+		"       //vs_out.color = (position+1.5)/2.5;	                           								\n"
+		"       vs_out.color = color;	                           								\n"
 		"    }                           									\n"
-		"    //vs_out.color = uni_color;							            \n"
 		"    gl_Position = proj_matrix * P;								    \n"
 		"}                                                                  \n"
 	};
@@ -295,6 +355,16 @@ void assignment1_app::startup()
 		GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
    #pragma endregion
+
+#pragma region Color Buffer
+	glGenBuffers(1, &colorBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(color_data),
+		color_data,
+		GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+#pragma endregion
 	
     #pragma region Buffer For Uniform Block
 	glGenBuffers(1, &uniforms_buffer);
@@ -386,6 +456,12 @@ void assignment1_app::render(double currentTime)
 	glEnableVertexAttribArray(0); //enable or disable a generic vertex attribute array
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
 
+	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+	glEnableVertexAttribArray(1); //enable or disable a generic vertex attribute array
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
+
+
+
 	vmath::mat4 model_matrix =
 		vmath::rotate((float)currentTime * 14.5f, 0.0f, 1.0f, 0.0f) *
 		vmath::rotate(45.0f, 0.0f, 1.0f, 0.0f)*
@@ -394,7 +470,7 @@ void assignment1_app::render(double currentTime)
 	block->mv_matrix = view_matrix * model_matrix;
 	block->view_matrix = view_matrix;
 	block->proj_matrix = perspective_matrix;
-	block->uni_color = orange;
+	block->uni_color = gray;
 	block->useUniformColor = false;
 	
 	glCullFace(GL_FRONT);
@@ -559,5 +635,18 @@ vmath::vec3 assignment1_app::getArcballVector(int x, int y) {
 	return vecP;
 }
 #pragma endregion
+
+float randomNumberBetweenZeroAndOne() {
+	return static_cast <float> (rand()) / static_cast <float> (1);
+}
+
+//GLfloat randomColor() {
+//	float r = randomNumberBetweenZeroAndOne();
+//	float g = randomNumberBetweenZeroAndOne();
+//	float b = randomNumberBetweenZeroAndOne();
+//	float a = 1.0f;
+//    GLfloat color[] = { r, g, b, a };
+//	return color;
+//}
 
 DECLARE_MAIN(assignment1_app)
