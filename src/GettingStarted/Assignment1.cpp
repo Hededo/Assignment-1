@@ -8,6 +8,8 @@
 #include <cmath>
 
 #define PI 3.14159265
+#define MANY_OBJECTS 1
+#undef MANY_OBJECTS
 
 class assignment1_app : public sb7::application
 {
@@ -257,78 +259,8 @@ void assignment1_app::startup()
 	GLuint vs;
 	GLuint fs;
 
-    #pragma region Vertex Shader
-	vs = glCreateShader(GL_VERTEX_SHADER);
-	static const char * vs_source[] =
-	{
-		"#version 410 core                                                  \n"
-		"// Per-vertex inputs                                                \n"
-		"layout (location = 0) in vec4 position;                            \n"
-        "layout (location = 1) in vec4 color;                            \n"
-		"layout (location = 2) in vec4 normal;                            \n"
-		"																	\n"
-		"layout(std140) uniform constants									\n"
-		"{																	\n"
-		"	mat4 mv_matrix;													\n"
-		"	mat4 view_matrix;												\n"
-		"	mat4 proj_matrix;												\n"
-		"	vec4 uni_color;										     		\n"
-		"	bool useUniformColor;										     		\n"
-		"};																	\n"
-		"                                                                   \n"
-		"out VS_OUT                                                         \n"
-		"{                                                                  \n"
-		"    vec4 color;                                                    \n"
-		"} vs_out;                                                          \n"
-		"                                                                   \n"
-		"                                                                   \n"
-		"void main(void)                                                    \n"
-		"{                                                                  \n"
-		"    // Calculate view-space coordinate								\n"
-		"    vec4 P = mv_matrix * position;									\n"
-		"    if (useUniformColor)									\n"
-		"    {                               								\n"
-		"       vs_out.color = uni_color;                               								\n"
-		"    }                           									\n"
-		"    else									\n"
-		"    {                               								\n"
-		"       //vs_out.color = (position+1.5)/2.5;	                           								\n"
-		"       vs_out.color = color;	                           								\n"
-		"    }                           									\n"
-		"    gl_Position = proj_matrix * P;								    \n"
-		"}                                                                  \n"
-	};
-	glShaderSource(vs, 1, vs_source, NULL);
-	glCompileShader(vs);
-	GLint success = 0;
-	glGetShaderiv(vs, GL_COMPILE_STATUS, &success);
-	assert(success != GL_FALSE);
-    #pragma endregion
-
-    #pragma region Fragment Shader
-	fs = glCreateShader(GL_FRAGMENT_SHADER);
-	static const char * fs_source[] =
-	{
-		"#version 410 core                                                  \n"
-		"                                                                   \n"
-		"out vec4 color;                                                    \n"
-		"                                                                   \n"
-		"in VS_OUT                                                          \n"
-		"{                                                                  \n"
-		"    vec4 color;                                                    \n"
-		"} fs_in;                                                           \n"
-		"                                                                   \n"
-		"void main(void)                                                    \n"
-		"{                                                                  \n"
-		"    color = fs_in.color;                                           \n"
-		"}                                                                  \n"
-	};
-	glShaderSource(fs, 1, fs_source, NULL);
-	glCompileShader(fs);
-    success = 0;
-	glGetShaderiv(fs, GL_COMPILE_STATUS, &success);
-	assert(success != GL_FALSE);
-    #pragma endregion
+	vs = sb7::shader::load("og_vertex.txt", GL_VERTEX_SHADER);
+	fs = sb7::shader::load("og_fragment.txt", GL_FRAGMENT_SHADER);
 
     #pragma region Attach Shaders To Program
 	glAttachShader(per_fragment_program, vs);
@@ -337,9 +269,6 @@ void assignment1_app::startup()
 
     #pragma region Link And Use Program
 	glLinkProgram(per_fragment_program); //glLinkProgram links the program object specified by program.
-	success = 0;
-	glGetProgramiv(per_fragment_program, GL_LINK_STATUS, &success); //glGetProgramiv returns in params the value of a parameter for a specific program object.
-	assert(success != GL_FALSE);
 	glUseProgram(per_fragment_program); // installs the program object specified by program as part of current rendering state.
     #pragma endregion
 
@@ -374,7 +303,7 @@ void assignment1_app::startup()
 
     #pragma region OPENGL Settings
 
-    #pragma region Make a room (4-walls, a ceiling and a floor).  Use face culling to see into the room.
+    #pragma region Use face culling to see into the room.
 	glEnable(GL_CULL_FACE);
    #pragma endregion
 	glFrontFace(GL_CW); //glFrontFace(GLenum mode) In a scene composed entirely of opaque closed surfaces, back-facing polygons are never visible.
@@ -460,7 +389,7 @@ void assignment1_app::render(double currentTime)
 	glEnableVertexAttribArray(1); //enable or disable a generic vertex attribute array
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
 
-
+   #pragma region Draw Room
 
 	vmath::mat4 model_matrix =
 		vmath::rotate((float)currentTime * 14.5f, 0.0f, 1.0f, 0.0f) *
@@ -476,6 +405,31 @@ void assignment1_app::render(double currentTime)
 	glCullFace(GL_FRONT);
 	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
 
+	#pragma endregion
+
+    #pragma region Draw Cube
+	glUnmapBuffer(GL_UNIFORM_BUFFER); //release the mapping of a buffer object's data store into the client's address space
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
+	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
+
+	model_matrix =
+		vmath::rotate((float)currentTime * 14.5f, 0.0f, 1.0f, 0.0f) *
+		vmath::rotate(0.0f, 0.0f, 1.0f, 0.0f)*
+		vmath::scale(5.0f);
+
+	vmath::mat4 trans = vmath::translate(10.0f, -17.5f, -1.0f);
+
+	block->mv_matrix = trans * view_matrix * model_matrix;
+	block->view_matrix = view_matrix;
+	block->proj_matrix = perspective_matrix;
+	block->uni_color = orange;
+	block->useUniformColor = false;
+
+	glCullFace(GL_BACK);
+	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
+    #pragma endregion
+
+    #pragma region Draw Sphere
 	glUnmapBuffer(GL_UNIFORM_BUFFER); //release the mapping of a buffer object's data store into the client's address space
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
 	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
@@ -485,7 +439,7 @@ void assignment1_app::render(double currentTime)
 		vmath::rotate(45.0f, 0.0f, 1.0f, 0.0f)*
 		vmath::scale(5.0f);
 
-	vmath::mat4 trans = vmath::translate(10.0f, -17.5f, -1.0f);
+	trans = vmath::translate(-10.0f, -17.5f, -2.0f);
 
 	block->mv_matrix = trans * view_matrix * model_matrix;
 	block->view_matrix = view_matrix;
@@ -495,6 +449,9 @@ void assignment1_app::render(double currentTime)
 
 	glCullFace(GL_BACK);
 	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
+    #pragma endregion
+
+
 }
 
 void assignment1_app::load_shaders()
@@ -502,8 +459,8 @@ void assignment1_app::load_shaders()
 	GLuint vs;
 	GLuint fs;
 
-	vs = sb7::shader::load("media/shaders/phonglighting/per-fragment-phong.vs.glsl", GL_VERTEX_SHADER);
-	fs = sb7::shader::load("media/shaders/phonglighting/per-fragment-phong.fs.glsl", GL_FRAGMENT_SHADER);
+	vs = sb7::shader::load("phong_perfragment.vs.glsl", GL_VERTEX_SHADER);
+	fs = sb7::shader::load("phong_perfragment.fs.glsl", GL_FRAGMENT_SHADER);
 
 	if (per_fragment_program)
 	{
@@ -520,8 +477,8 @@ void assignment1_app::load_shaders()
 	uniforms[0].specular_albedo = glGetUniformLocation(per_fragment_program, "specular_albedo");
 	uniforms[0].specular_power = glGetUniformLocation(per_fragment_program, "specular_power");
 
-	vs = sb7::shader::load("media/shaders/phonglighting/per-vertex-phong.vs.glsl", GL_VERTEX_SHADER);
-	fs = sb7::shader::load("media/shaders/phonglighting/per-vertex-phong.fs.glsl", GL_FRAGMENT_SHADER);
+	vs = sb7::shader::load("phong_pervertex.vs.glsl", GL_VERTEX_SHADER);
+	fs = sb7::shader::load("phong_pervertex.fs.glsl", GL_FRAGMENT_SHADER);
 
 	if (per_vertex_program)
 	{
@@ -635,18 +592,5 @@ vmath::vec3 assignment1_app::getArcballVector(int x, int y) {
 	return vecP;
 }
 #pragma endregion
-
-float randomNumberBetweenZeroAndOne() {
-	return static_cast <float> (rand()) / static_cast <float> (1);
-}
-
-//GLfloat randomColor() {
-//	float r = randomNumberBetweenZeroAndOne();
-//	float g = randomNumberBetweenZeroAndOne();
-//	float b = randomNumberBetweenZeroAndOne();
-//	float a = 1.0f;
-//    GLfloat color[] = { r, g, b, a };
-//	return color;
-//}
 
 DECLARE_MAIN(assignment1_app)
