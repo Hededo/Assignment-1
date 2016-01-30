@@ -62,6 +62,7 @@ protected:
         vmath::mat4     view_matrix;
         vmath::mat4     proj_matrix;
 		vmath::vec4     uni_color;
+		bool		    useUniformColor;
     };
 
     GLuint          uniforms_buffer;
@@ -76,6 +77,7 @@ protected:
 	sb7::object     object;
 
 	bool            per_vertex;
+	bool            useUniformColor;
 
 
 	// Variables for mouse interaction
@@ -211,6 +213,7 @@ void assignment1_app::startup()
 		"	mat4 view_matrix;												\n"
 		"	mat4 proj_matrix;												\n"
 		"	vec4 uni_color;										     		\n"
+		"	bool useUniformColor;										     		\n"
 		"};																	\n"
 		"                                                                   \n"
 		"out VS_OUT                                                         \n"
@@ -223,8 +226,15 @@ void assignment1_app::startup()
 		"{                                                                  \n"
 		"    // Calculate view-space coordinate								\n"
 		"    vec4 P = mv_matrix * position;									\n"
-		"    //vs_out.color = (position+1.5)/2.5;							    \n"
-		"    vs_out.color = uni_color;							    \n"
+		"    if (useUniformColor)									\n"
+		"    {                               								\n"
+		"       vs_out.color = uni_color;                               								\n"
+		"    }                           									\n"
+		"    else									\n"
+		"    {                               								\n"
+		"       vs_out.color = (position+1.5)/2.5;	                           								\n"
+		"    }                           									\n"
+		"    //vs_out.color = uni_color;							            \n"
 		"    gl_Position = proj_matrix * P;								    \n"
 		"}                                                                  \n"
 	};
@@ -301,6 +311,8 @@ void assignment1_app::startup()
     glEnable(GL_DEPTH_TEST); //glEnable(GLenum cap) glEnable and glDisable enable and disable various capabilities.
     glDepthFunc(GL_LEQUAL);	//glDepthFunc(GLenum func) specifies the function used to compare each incoming pixel depth value with the depth value present in the depth buffer. 
     #pragma endregion
+
+	useUniformColor = false;
 }
 
 void assignment1_app::render(double currentTime)
@@ -374,35 +386,36 @@ void assignment1_app::render(double currentTime)
 	glEnableVertexAttribArray(0); //enable or disable a generic vertex attribute array
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
 
-
 	vmath::mat4 model_matrix =
 		vmath::rotate((float)currentTime * 14.5f, 0.0f, 1.0f, 0.0f) *
 		vmath::rotate(45.0f, 0.0f, 1.0f, 0.0f)*
-		vmath::scale(7.0f);
+		vmath::scale(22.0f);
 
 	block->mv_matrix = view_matrix * model_matrix;
 	block->view_matrix = view_matrix;
 	block->proj_matrix = perspective_matrix;
 	block->uni_color = orange;
+	block->useUniformColor = false;
 	
 	glCullFace(GL_FRONT);
 	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
 
 	glUnmapBuffer(GL_UNIFORM_BUFFER); //release the mapping of a buffer object's data store into the client's address space
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
-	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
 
 	model_matrix =
 		vmath::rotate((float)currentTime * 14.5f, 0.0f, 1.0f, 0.0f) *
 		vmath::rotate(45.0f, 0.0f, 1.0f, 0.0f)*
 		vmath::scale(5.0f);
 
-	vmath::mat4 trans = vmath::translate(10.0f, 4.0f, 0.0f);
+	vmath::mat4 trans = vmath::translate(10.0f, -17.5f, -1.0f);
 
 	block->mv_matrix = trans * view_matrix * model_matrix;
 	block->view_matrix = view_matrix;
 	block->proj_matrix = perspective_matrix;
-	block->uni_color = purple;
+	block->uni_color = orange;
+	block->useUniformColor = useUniformColor;
 
 	glCullFace(GL_BACK);
 	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
@@ -472,6 +485,10 @@ void assignment1_app::onKey(int key, int action)
                 break;
 			case 'V':
 				per_vertex = !per_vertex;
+				break;
+			case 'C':
+				// Provide a ‘C’ key to switch between colors in the vertex attribute to a constant color for shading the sphere.
+				useUniformColor = !useUniformColor;
 				break;
 		}
     }
