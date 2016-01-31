@@ -66,6 +66,7 @@ protected:
 		vmath::vec4     uni_color;
 		bool		    useUniformColor;
 		vmath::vec3     lightPos;
+		vmath::vec3		diffuse_albedo;
     };
 
     GLuint          uniforms_buffer;
@@ -301,6 +302,12 @@ private:
 	float fYpos = 0.0f;
 	float fZpos = 75.0f;
 
+	// Initial light pos
+	float iLightPosX = 1.0f;
+	float iLightPosY = 0.5f;
+	float iLightPosZ = 0.0f;
+	vmath::vec3 lightPos = vmath::vec3(iLightPosX, iLightPosY, iLightPosZ);
+
 	GLuint buffer;
 	GLuint colorBuffer;
 	GLuint normalsBuffer;
@@ -353,9 +360,7 @@ void assignment1_app::startup()
 
     #pragma region OPENGL Settings
 
-    #pragma region Use face culling to see into the room.
-	glEnable(GL_CULL_FACE);
-   #pragma endregion
+	glEnable(GL_CULL_FACE); // Use face culling to see into the room.
 	glFrontFace(GL_CW); //glFrontFace(GLenum mode) In a scene composed entirely of opaque closed surfaces, back-facing polygons are never visible.
     glEnable(GL_DEPTH_TEST); //glEnable(GLenum cap) glEnable and glDisable enable and disable various capabilities.
     glDepthFunc(GL_LEQUAL);	//glDepthFunc(GLenum func) specifies the function used to compare each incoming pixel depth value with the depth value present in the depth buffer. 
@@ -406,6 +411,15 @@ void assignment1_app::render(double currentTime)
 			iPrevMouseX = iCurMouseX;
 			translationMatrix = vmath::translate(fXpos / (info.windowWidth / fZpos), -fYpos/(info.windowWidth / fZpos), 0.0f);
 		}
+		//Light position tracks with the camera
+		lightPos = vmath::vec3(iLightPosX * translationMatrix[0][0] + iLightPosX * translationMatrix[0][1] + iLightPosX * translationMatrix[0][2],
+			iLightPosY * translationMatrix[1][0] + iLightPosY * translationMatrix[1][1] + iLightPosY * translationMatrix[1][2],
+			iLightPosZ * translationMatrix[2][0] + iLightPosZ * translationMatrix[2][1] + iLightPosZ * translationMatrix[2][2]
+			);
+		lightPos = vmath::vec3(lightPos[0] * rotationMatrix[0][0] + lightPos[0] * rotationMatrix[0][1] + lightPos[0] * rotationMatrix[0][2],
+			lightPos[1] * rotationMatrix[1][0] + lightPos[1] * rotationMatrix[1][1] + lightPos[1] * rotationMatrix[1][2],
+			lightPos[2] * rotationMatrix[2][0] + lightPos[2] * rotationMatrix[2][1] + lightPos[2] * rotationMatrix[2][2]
+			);
 	}
     #pragma endregion
 
@@ -443,6 +457,13 @@ void assignment1_app::render(double currentTime)
 	glEnableVertexAttribArray(2); //enable or disable a generic vertex attribute array
 	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
 
+    #pragma region Uniforms that remain constant
+	block->proj_matrix = perspective_matrix;
+	block->uni_color = orange; 
+	block->useUniformColor = false;
+	block->lightPos = lightPos;
+    #pragma endregion
+
    #pragma region Draw Room
 
 	vmath::mat4 model_matrix =
@@ -452,9 +473,6 @@ void assignment1_app::render(double currentTime)
 
 	block->mv_matrix = view_matrix * model_matrix;
 	block->view_matrix = view_matrix;
-	block->proj_matrix = perspective_matrix;
-	block->uni_color = gray;
-	block->useUniformColor = false;
 	
 	glCullFace(GL_FRONT);
 	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
@@ -468,15 +486,11 @@ void assignment1_app::render(double currentTime)
 
 	model_matrix =
 		vmath::rotate(0.0f, 0.0f, 1.0f, 0.0f)*
+		vmath::translate(10.0f, -17.5f, -1.0f) *
 		vmath::scale(5.0f);
 
-	vmath::mat4 trans = vmath::translate(10.0f, -17.5f, -1.0f);
-
-	block->mv_matrix =  view_matrix * trans * model_matrix;
+	block->mv_matrix =  view_matrix * model_matrix;
 	block->view_matrix = view_matrix;
-	block->proj_matrix = perspective_matrix;
-	block->uni_color = orange;
-	block->useUniformColor = false;
 
 	glCullFace(GL_BACK);
 	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
@@ -489,14 +503,11 @@ void assignment1_app::render(double currentTime)
 
 	model_matrix =
 		vmath::rotate(45.0f, 0.0f, 1.0f, 0.0f)*
+		vmath::translate(-10.0f, -17.5f, -2.0f) *
 		vmath::scale(5.0f);
 
-	trans = vmath::translate(-10.0f, -17.5f, -2.0f);
-
-	block->mv_matrix = view_matrix * trans * model_matrix;
+	block->mv_matrix = view_matrix * model_matrix;
 	block->view_matrix = view_matrix;
-	block->proj_matrix = perspective_matrix;
-	block->uni_color = orange;
 	block->useUniformColor = useUniformColor;
 
 	glCullFace(GL_BACK);
