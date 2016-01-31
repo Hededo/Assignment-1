@@ -65,6 +65,7 @@ protected:
         vmath::mat4     proj_matrix;
 		vmath::vec4     uni_color;
 		bool		    useUniformColor;
+		vmath::vec3     lightPos;
     };
 
     GLuint          uniforms_buffer;
@@ -223,6 +224,63 @@ protected:
 		0.0f, 0.0f, 1.0f, 1.0f,
 		//End Cube
 	};
+
+	const GLfloat normals_data[numberOfVerticeComponents] = {
+		//B (Green)
+		0.0f,  0.0f,  -1.0f, 1.0f,
+		0.0f,  0.0f,  -1.0f, 1.0f,
+		0.0f,  0.0f,  -1.0f, 1.0f,
+
+		0.0f,  0.0f,  -1.0f, 1.0f,
+		0.0f,  0.0f,  -1.0f, 1.0f,
+		0.0f,  0.0f,  -1.0f, 1.0f,
+
+		//R (Red)
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+
+		//F (Green)
+		0.0f,  0.0f,  1.0f, 1.0f,
+		0.0f,  0.0f,  1.0f, 1.0f,
+		0.0f,  0.0f,  1.0f, 1.0f,
+
+		0.0f,  0.0f,  1.0f, 1.0f,
+		0.0f,  0.0f,  1.0f, 1.0f,
+		0.0f,  0.0f,  1.0f, 1.0f,
+
+		//L (Red)
+		-1.0f,  0.0f,  0.0f,  1.0f,
+		-1.0f,  0.0f,  0.0f,  1.0f,
+		-1.0f,  0.0f,  0.0f,  1.0f,
+
+		-1.0f,  0.0f,  0.0f,  1.0f,
+		-1.0f,  0.0f,  0.0f,  1.0f,
+		-1.0f,  0.0f,  0.0f,  1.0f,
+
+		//D (Blue)
+		0.0f, -1.0f, 0.0f, 1.0f,
+		0.0f, -1.0f, 0.0f, 1.0f,
+		0.0f, -1.0f, 0.0f, 1.0f,
+
+		0.0f, -1.0f, 0.0f, 1.0f,
+		0.0f, -1.0f, 0.0f, 1.0f,
+		0.0f, -1.0f, 0.0f, 1.0f,
+
+		//U
+		0.0f, 1.0f, 0.0f, 1.0f,
+		0.0f, 1.0f, 0.0f, 1.0f,
+		0.0f, 1.0f, 0.0f, 1.0f,
+
+		0.0f, 1.0f, 0.0f, 1.0f,
+		0.0f, 1.0f, 0.0f, 1.0f,
+		0.0f, 1.0f, 0.0f, 1.0f,
+		//End Cube
+	};
 #pragma endregion
 
 #pragma endregion
@@ -245,6 +303,7 @@ private:
 
 	GLuint buffer;
 	GLuint colorBuffer;
+	GLuint normalsBuffer;
 	GLuint vao2;
 #pragma endregion
 };
@@ -291,6 +350,16 @@ void assignment1_app::startup()
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(color_data),
 		color_data,
+		GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+#pragma endregion
+
+#pragma region Normals Buffer
+	glGenBuffers(1, &normalsBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, normalsBuffer);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(normals_data),
+		normals_data,
 		GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 #pragma endregion
@@ -389,10 +458,14 @@ void assignment1_app::render(double currentTime)
 	glEnableVertexAttribArray(1); //enable or disable a generic vertex attribute array
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
 
+	glBindBuffer(GL_ARRAY_BUFFER, normalsBuffer);
+	glEnableVertexAttribArray(2); //enable or disable a generic vertex attribute array
+	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
+
    #pragma region Draw Room
 
 	vmath::mat4 model_matrix =
-		vmath::rotate((float)currentTime * 14.5f, 0.0f, 1.0f, 0.0f) *
+		//vmath::rotate((float)currentTime * 14.5f, 0.0f, 1.0f, 0.0f) *
 		vmath::rotate(45.0f, 0.0f, 1.0f, 0.0f)*
 		vmath::scale(22.0f);
 
@@ -413,13 +486,12 @@ void assignment1_app::render(double currentTime)
 	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
 
 	model_matrix =
-		vmath::rotate((float)currentTime * 14.5f, 0.0f, 1.0f, 0.0f) *
 		vmath::rotate(0.0f, 0.0f, 1.0f, 0.0f)*
 		vmath::scale(5.0f);
 
 	vmath::mat4 trans = vmath::translate(10.0f, -17.5f, -1.0f);
 
-	block->mv_matrix = trans * view_matrix * model_matrix;
+	block->mv_matrix =  view_matrix * trans * model_matrix;
 	block->view_matrix = view_matrix;
 	block->proj_matrix = perspective_matrix;
 	block->uni_color = orange;
@@ -435,13 +507,12 @@ void assignment1_app::render(double currentTime)
 	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
 
 	model_matrix =
-		vmath::rotate((float)currentTime * 14.5f, 0.0f, 1.0f, 0.0f) *
 		vmath::rotate(45.0f, 0.0f, 1.0f, 0.0f)*
 		vmath::scale(5.0f);
 
 	trans = vmath::translate(-10.0f, -17.5f, -2.0f);
 
-	block->mv_matrix = trans * view_matrix * model_matrix;
+	block->mv_matrix = view_matrix * trans * model_matrix;
 	block->view_matrix = view_matrix;
 	block->proj_matrix = perspective_matrix;
 	block->uni_color = orange;

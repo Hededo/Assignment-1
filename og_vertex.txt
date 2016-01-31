@@ -28,8 +28,7 @@ void main(void)
        vs_out.color = uni_color;                               							
     }                           									
     else									
-    {                               						
-       //vs_out.color = (position+1.5)/2.5;	                           							
+    {                               							
        vs_out.color = color;	                           						
     }                           									
     gl_Position = proj_matrix * P;								    

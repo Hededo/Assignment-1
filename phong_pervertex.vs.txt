@@ -4,14 +4,17 @@
 
 // Per-vertex inputs
 layout (location = 0) in vec4 position;
-layout (location = 1) in vec3 normal;
+layout (location = 1) in vec4 color;                            
+layout (location = 2) in vec4 normal;  
 
 // Matrices we'll need
 layout (std140) uniform constants
 {
-    mat4 mv_matrix;
-    mat4 view_matrix;
-    mat4 proj_matrix;
+    mat4 mv_matrix;													
+	mat4 view_matrix;												
+	mat4 proj_matrix;												
+	vec4 uni_color;										     		
+	bool useUniformColor;
 };
 
 // Light and material properties
@@ -23,10 +26,10 @@ uniform vec3 ambient = vec3(0.2, 0.2, 0.2);
 uniform int oneColor = 0;
 
 // Outputs to the fragment shader
-out VS_OUT
-{
-    vec3 color;
-} vs_out;
+out VS_OUT                                                         
+{                                                                 
+    vec4 color;                                                    
+} vs_out;         
 
 void main(void)
 {
