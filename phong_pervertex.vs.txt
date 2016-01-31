@@ -52,8 +52,8 @@ void main(void)
 								
     if (useUniformColor)								
     {                               							
-       vs_out.color = (ambient + diffuse + specular)*uni_color.xyz;                               							
-    }                           									              
+       vs_out.color = (ambient + diffuse + specular)*uni_color.xyz;		
+	}                           									           
   
 	// Calculate the clip-space position of each vertex
     gl_Position = proj_matrix * P;							    
