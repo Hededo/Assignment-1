@@ -530,8 +530,8 @@ void assignment1_app::load_shaders()
 	GLuint vs;
 	GLuint fs;
 
-	vs = sb7::shader::load("phong_perfragment.vs.glsl", GL_VERTEX_SHADER);
-	fs = sb7::shader::load("phong_perfragment.fs.glsl", GL_FRAGMENT_SHADER);
+	vs = sb7::shader::load("phong_perfragment.vs.txt", GL_VERTEX_SHADER);
+	fs = sb7::shader::load("phong_perfragment.fs.txt", GL_FRAGMENT_SHADER);
 
 	if (per_fragment_program)
 	{
@@ -548,8 +548,8 @@ void assignment1_app::load_shaders()
 	uniforms[0].specular_albedo = glGetUniformLocation(per_fragment_program, "specular_albedo");
 	uniforms[0].specular_power = glGetUniformLocation(per_fragment_program, "specular_power");
 
-	vs = sb7::shader::load("phong_pervertex.vs.glsl", GL_VERTEX_SHADER);
-	fs = sb7::shader::load("phong_pervertex.fs.glsl", GL_FRAGMENT_SHADER);
+	vs = sb7::shader::load("phong_pervertex.vs.txt", GL_VERTEX_SHADER);
+	fs = sb7::shader::load("phong_pervertex.fs.txt", GL_FRAGMENT_SHADER);
 
 	if (per_vertex_program)
 	{
