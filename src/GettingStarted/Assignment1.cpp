@@ -312,25 +312,6 @@ void assignment1_app::startup()
 {
 	load_shaders();
 
-	// Create program for the spinning cube
-	per_fragment_program = glCreateProgram(); //glCreateProgram creates an empty program object and returns a non-zero value by which it can be referenced. A program object is an object to which shader objects can be attached.
-
-	GLuint vs;
-	GLuint fs;
-
-	vs = sb7::shader::load("og_vertex.txt", GL_VERTEX_SHADER);
-	fs = sb7::shader::load("og_fragment.txt", GL_FRAGMENT_SHADER);
-
-    #pragma region Attach Shaders To Program
-	glAttachShader(per_fragment_program, vs);
-	glAttachShader(per_fragment_program, fs);
-    #pragma endregion
-
-    #pragma region Link And Use Program
-	glLinkProgram(per_fragment_program); //glLinkProgram links the program object specified by program.
-	glUseProgram(per_fragment_program); // installs the program object specified by program as part of current rendering state.
-    #pragma endregion
-
 	glGenVertexArrays(1, &vao2);  //glGenVertexArrays(n, &array) returns n vertex array object names in arrays
 	glBindVertexArray(vao2); //glBindVertexArray(array) binds the vertex array object with name array.
 

@@ -14,5 +14,5 @@ in VS_OUT
 void main(void)
 {
     // Write incoming color to the framebuffer
-    color = vec4(fs_in.color, 1.0);
+    color = vec4(fs_in.color.x, fs_in.color.y, fs_in.color.z, 1.0);
 }

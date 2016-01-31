@@ -274,8 +274,6 @@
     <None Include="bin\media\objects\sphere.sbm" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="og_vertex.txt" />
-    <Text Include="og_fragment.txt" />
     <Text Include="phong_perfragment.fs.txt" />
     <Text Include="phong_perfragment.vs.txt" />
     <Text Include="phong_pervertex.fs.txt" />
