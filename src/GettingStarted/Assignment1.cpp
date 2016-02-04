@@ -8,6 +8,8 @@
 #include <cmath>
 
 #define PI 3.14159265
+#define MANY_OBJECTS 1
+#undef MANY_OBJECTS
 
 class assignment1_app : public sb7::application
 {
@@ -61,6 +63,10 @@ protected:
         vmath::mat4     mv_matrix;
         vmath::mat4     view_matrix;
         vmath::mat4     proj_matrix;
+		vmath::vec4     uni_color;
+		bool		    useUniformColor;
+		vmath::vec3     lightPos;
+		vmath::vec3		diffuse_albedo;
     };
 
     GLuint          uniforms_buffer;
@@ -75,6 +81,7 @@ protected:
 	sb7::object     object;
 
 	bool            per_vertex;
+	bool            useUniformColor;
 
 
 	// Variables for mouse interaction
@@ -93,18 +100,20 @@ protected:
 
     #pragma region Colors
     const GLfloat zeros[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	const GLfloat gray[4] = { 0.1f, 0.1f, 0.1f, 0.0f };
 	const GLfloat green[4] = { 0.0f, 0.25f, 0.0f, 1.0f };
 	const GLfloat skyBlue[4] = { 0.529f, 0.808f, 0.922f, 1.0f };
 	const GLfloat ones[4] = { 1.0f, 1.0f, 1.0f, 1.0f};
+	const vmath::vec4 white = vmath::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	const vmath::vec4 orange = vmath::vec4(1.0f, 0.5f, 0.0f, 1.0f);
+	const vmath::vec4 purple = vmath::vec4(1.0f, 0.0f, 1.0f, 1.0f);
+	const vmath::vec4 gray = vmath::vec4(0.8f, 0.8f, 0.8f, 1.0f);
     #pragma endregion
 
 #pragma region Vertex Data
-    static const int numberOfVertices = 72;
+    static const int numberOfVertices = 36;
 	static const int numberOfVerticeComponents = numberOfVertices * 4;
-    const GLfloat vertex_data[numberOfVerticeComponents] =
+    const GLfloat cube_data[numberOfVerticeComponents] =
 	{
-		// Cube #1
 		//B
 		-1.0f, 1.0f, -1.0f, 1.0f,
 		-1.0f, -1.0f, -1.0f, 1.0f,
@@ -159,63 +168,120 @@ protected:
 		-1.0f, 1.0f, 1.0f, 1.0f,
 		-1.0f, 1.0f, -1.0f, 1.0f,
 		//End Cube
+	};
 
-		// Room
-		//B
-		-3.0f, 3.0f, -3.0f, 1.0f,
-		-3.0f, -3.0f, -3.0f, 1.0f,
-		3.0f, -3.0f, -3.0f, 1.0f,
+	const GLfloat color_data[numberOfVerticeComponents] = { 
+		//B (Green)
+		0.0f,  1.0f,  0.0f, 1.0f,
+		0.0f,  1.0f,  0.0f, 1.0f,
+		0.0f,  1.0f,  0.0f, 1.0f,
 
-		3.0f, -3.0f, -3.0f, 1.0f,
-		3.0f, 3.0f, -3.0f, 1.0f,
-		-3.0f, 3.0f, -3.0f, 1.0f,
+		0.0f,  1.0f,  0.0f, 1.0f,
+		0.0f,  1.0f,  0.0f, 1.0f,
+		0.0f,  1.0f,  0.0f, 1.0f,
 
-		//R
-		3.0f, -3.0f, -3.0f, 1.0f,
-		3.0f, -3.0f, 3.0f, 1.0f,
-		3.0f, 3.0f, -3.0f, 1.0f,
+		//R (Red)
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
 
-		3.0f, -3.0f, 3.0f, 1.0f,
-		3.0f, 3.0f, 3.0f, 1.0f,
-		3.0f, 3.0f, -3.0f, 1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
 
-		//F
-		3.0f, -3.0f, 3.0f, 1.0f,
-		-3.0f, -3.0f, 3.0f, 1.0f,
-		3.0f, 3.0f, 3.0f, 1.0f,
+		//F (Green)
+		0.0f,  1.0f,  0.0f, 1.0f,
+		0.0f,  1.0f,  0.0f, 1.0f,
+		0.0f,  1.0f,  0.0f, 1.0f,
 
-		-3.0f, -3.0f, 3.0f, 1.0f,
-		-3.0f, 3.0f, 3.0f, 1.0f,
-		3.0f, 3.0f, 3.0f, 1.0f,
+		0.0f,  1.0f,  0.0f, 1.0f,
+		0.0f,  1.0f,  0.0f, 1.0f,
+		0.0f,  1.0f,  0.0f, 1.0f,
 
-		//L
-		-3.0f, -3.0f, 3.0f, 1.0f,
-		-3.0f, -3.0f, -3.0f, 1.0f,
-		-3.0f, 3.0f, 3.0f, 1.0f,
+		//L (Red)
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
 
-		-3.0f, -3.0f, -3.0f, 1.0f,
-		-3.0f, 3.0f, -3.0f, 1.0f,
-		-3.0f, 3.0f, 3.0f, 1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
 
-		//D
-		-3.0f, -3.0f, 3.0f, 1.0f,
-		3.0f, -3.0f, 3.0f, 1.0f,
-		3.0f, -3.0f, -3.0f, 1.0f,
+		//D (Blue)
+		0.0f, 0.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 1.0f, 1.0f,
 
-		3.0f, -3.0f, -3.0f, 1.0f,
-		-3.0f, -3.0f, -3.0f, 1.0f,
-		-3.0f, -3.0f, 3.0f, 1.0f,
+		0.0f, 0.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 1.0f, 1.0f,
 
 		//U
-		-3.0f, 3.0f, -3.0f, 1.0f,
-		3.0f, 3.0f, -3.0f, 1.0f,
-		3.0f, 3.0f, 3.0f, 1.0f,
+		0.0f, 0.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 1.0f, 1.0f,
 
-		3.0f, 3.0f, 3.0f, 1.0f,
-		-3.0f, 3.0f, 3.0f, 1.0f,
-		-3.0f, 3.0f, -3.0f, 1.0f,
-		//End Room
+		0.0f, 0.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 1.0f, 1.0f,
+		//End Cube
+	};
 
+	const GLfloat normals_data[numberOfVerticeComponents] = {
+		//B (Green)
+		0.0f,  0.0f,  1.0f, 1.0f,
+		0.0f,  0.0f,  1.0f, 1.0f,
+		0.0f,  0.0f,  1.0f, 1.0f,
+
+		0.0f,  0.0f,  1.0f, 1.0f,
+		0.0f,  0.0f,  1.0f, 1.0f,
+		0.0f,  0.0f,  1.0f, 1.0f,
+
+		//R (Red)
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+
+		//F (Green)
+		0.0f,  0.0f,  -1.0f, 1.0f,
+		0.0f,  0.0f,  -1.0f, 1.0f,
+		0.0f,  0.0f,  -1.0f, 1.0f,
+
+		0.0f,  0.0f,  -1.0f, 1.0f,
+		0.0f,  0.0f,  -1.0f, 1.0f,
+		0.0f,  0.0f,  -1.0f, 1.0f,
+
+		//L (Red)
+		-1.0f,  0.0f,  0.0f,  1.0f,
+		-1.0f,  0.0f,  0.0f,  1.0f,
+		-1.0f,  0.0f,  0.0f,  1.0f,
+
+		-1.0f,  0.0f,  0.0f,  1.0f,
+		-1.0f,  0.0f,  0.0f,  1.0f,
+		-1.0f,  0.0f,  0.0f,  1.0f,
+
+		//D (Blue)
+		0.0f, 1.0f, 0.0f, 1.0f,
+		0.0f, 1.0f, 0.0f, 1.0f,
+		0.0f, 1.0f, 0.0f, 1.0f,
+
+		0.0f, 1.0f, 0.0f, 1.0f,
+		0.0f, 1.0f, 0.0f, 1.0f,
+		0.0f, 1.0f, 0.0f, 1.0f,
+
+		//U
+		0.0f, -1.0f, 0.0f, 1.0f,
+		0.0f, -1.0f, 0.0f, 1.0f,
+		0.0f, -1.0f, 0.0f, 1.0f,
+
+		0.0f, -1.0f, 0.0f, 1.0f,
+		0.0f, -1.0f, 0.0f, 1.0f,
+		0.0f, -1.0f, 0.0f, 1.0f,
+		//End Cube
 	};
 #pragma endregion
 
@@ -237,92 +303,22 @@ private:
 	float fYpos = 0.0f;
 	float fZpos = 75.0f;
 
+	// Initial light pos
+	float iLightPosX = 1.0f;
+	float iLightPosY = 0.5f;
+	float iLightPosZ = 0.0f;
+	vmath::vec3 lightPos = vmath::vec3(iLightPosX, iLightPosY, iLightPosZ);
+
 	GLuint buffer;
+	GLuint colorBuffer;
+	GLuint normalsBuffer;
 	GLuint vao2;
 #pragma endregion
 };
 
 void assignment1_app::startup()
 {
-
 	load_shaders();
-
-	// Create program for the spinning cube
-	per_fragment_program = glCreateProgram(); //glCreateProgram creates an empty program object and returns a non-zero value by which it can be referenced. A program object is an object to which shader objects can be attached.
-
-    #pragma region Vertex Shader
-	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-	static const char * vs_source[] =
-	{
-		"#version 410 core                                                  \n"
-		"                                                                   \n"
-		"layout (location = 0) in vec4 position;                            \n"
-		"																	\n"
-		"layout(std140) uniform constants									\n"
-		"{																	\n"
-		"	mat4 mv_matrix;													\n"
-		"	mat4 view_matrix;												\n"
-		"	mat4 proj_matrix;												\n"
-		"};																	\n"
-		"                                                                   \n"
-		"out VS_OUT                                                         \n"
-		"{                                                                  \n"
-		"    vec4 color;                                                    \n"
-		"} vs_out;                                                          \n"
-		"                                                                   \n"
-		"                                                                   \n"
-		"void main(void)                                                    \n"
-		"{                                                                  \n"
-		"    // Calculate view-space coordinate								\n"
-		"    vec4 P = mv_matrix * position;									\n"
-		"    vs_out.color = (position+1.5)/2.5;							    \n"
-		"    gl_Position = proj_matrix * P;								    \n"
-		"}                                                                  \n"
-	};
-	glShaderSource(vs, 1, vs_source, NULL);
-	glCompileShader(vs);
-	GLint success = 0;
-	glGetShaderiv(vs, GL_COMPILE_STATUS, &success);
-	assert(success != GL_FALSE);
-    #pragma endregion
-
-    #pragma region Fragment Shader
-	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-	static const char * fs_source[] =
-	{
-		"#version 410 core                                                  \n"
-		"                                                                   \n"
-		"out vec4 color;                                                    \n"
-		"                                                                   \n"
-		"in VS_OUT                                                          \n"
-		"{                                                                  \n"
-		"    vec4 color;                                                    \n"
-		"} fs_in;                                                           \n"
-		"                                                                   \n"
-		"void main(void)                                                    \n"
-		"{                                                                  \n"
-		"    color = fs_in.color;                                           \n"
-		"}                                                                  \n"
-	};
-	glShaderSource(fs, 1, fs_source, NULL);
-	glCompileShader(fs);
-    success = 0;
-	glGetShaderiv(fs, GL_COMPILE_STATUS, &success);
-	assert(success != GL_FALSE);
-    #pragma endregion
-
-    #pragma region Attach Shaders To Program
-	glAttachShader(per_fragment_program, vs);
-	glAttachShader(per_fragment_program, fs);
-    #pragma endregion
-
-    #pragma region Link And Use Program
-	glLinkProgram(per_fragment_program); //glLinkProgram links the program object specified by program.
-	success = 0;
-	glGetProgramiv(per_fragment_program, GL_LINK_STATUS, &success); //glGetProgramiv returns in params the value of a parameter for a specific program object.
-	assert(success != GL_FALSE);
-	glUseProgram(per_fragment_program); // installs the program object specified by program as part of current rendering state.
-    #pragma endregion
 
 	glGenVertexArrays(1, &vao2);  //glGenVertexArrays(n, &array) returns n vertex array object names in arrays
 	glBindVertexArray(vao2); //glBindVertexArray(array) binds the vertex array object with name array.
@@ -331,11 +327,31 @@ void assignment1_app::startup()
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
 	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(vertex_data),
-		vertex_data,
+		sizeof(cube_data),
+		cube_data,
 		GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
    #pragma endregion
+
+#pragma region Color Buffer
+	glGenBuffers(1, &colorBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(color_data),
+		color_data,
+		GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+#pragma endregion
+
+#pragma region Normals Buffer
+	glGenBuffers(1, &normalsBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, normalsBuffer);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(normals_data),
+		normals_data,
+		GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+#pragma endregion
 	
     #pragma region Buffer For Uniform Block
 	glGenBuffers(1, &uniforms_buffer);
@@ -345,14 +361,15 @@ void assignment1_app::startup()
 
     #pragma region OPENGL Settings
 
-    #pragma region Make a room (4-walls, a ceiling and a floor).  Use face culling to see into the room.
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
-   #pragma endregion
+	glEnable(GL_CULL_FACE); // Use face culling to see into the room.
 	glFrontFace(GL_CW); //glFrontFace(GLenum mode) In a scene composed entirely of opaque closed surfaces, back-facing polygons are never visible.
     glEnable(GL_DEPTH_TEST); //glEnable(GLenum cap) glEnable and glDisable enable and disable various capabilities.
     glDepthFunc(GL_LEQUAL);	//glDepthFunc(GLenum func) specifies the function used to compare each incoming pixel depth value with the depth value present in the depth buffer. 
     #pragma endregion
+
+	useUniformColor = false;
+
+	//object.load("bin\\media\\objects\\dragon.sbm");
 }
 
 void assignment1_app::render(double currentTime)
@@ -397,6 +414,15 @@ void assignment1_app::render(double currentTime)
 			iPrevMouseX = iCurMouseX;
 			translationMatrix = vmath::translate(fXpos / (info.windowWidth / fZpos), -fYpos/(info.windowWidth / fZpos), 0.0f);
 		}
+		//Light position tracks with the camera
+		lightPos = vmath::vec3(iLightPosX * translationMatrix[0][0] + iLightPosX * translationMatrix[0][1] + iLightPosX * translationMatrix[0][2],
+			iLightPosY * translationMatrix[1][0] + iLightPosY * translationMatrix[1][1] + iLightPosY * translationMatrix[1][2],
+			iLightPosZ * translationMatrix[2][0] + iLightPosZ * translationMatrix[2][1] + iLightPosZ * translationMatrix[2][2]
+			);
+		lightPos = vmath::vec3(lightPos[0] * rotationMatrix[0][0] + lightPos[0] * rotationMatrix[0][1] + lightPos[0] * rotationMatrix[0][2],
+			lightPos[1] * rotationMatrix[1][0] + lightPos[1] * rotationMatrix[1][1] + lightPos[1] * rotationMatrix[1][2],
+			lightPos[2] * rotationMatrix[2][0] + lightPos[2] * rotationMatrix[2][1] + lightPos[2] * rotationMatrix[2][2]
+			);
 	}
     #pragma endregion
 
@@ -418,24 +444,128 @@ void assignment1_app::render(double currentTime)
 
 	// Render cube
 	
+	glUnmapBuffer(GL_UNIFORM_BUFFER); //release the mapping of a buffer object's data store into the client's address space
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
 	uniforms_block * block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glEnableVertexAttribArray(0); //enable or disable a generic vertex attribute array
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
+
+	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+	glEnableVertexAttribArray(1); //enable or disable a generic vertex attribute array
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
+
+	glBindBuffer(GL_ARRAY_BUFFER, normalsBuffer);
+	glEnableVertexAttribArray(2); //enable or disable a generic vertex attribute array
+	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
+
+    #pragma region Uniforms that remain constant
+	block->proj_matrix = perspective_matrix;
+	block->uni_color = white; 
+	block->useUniformColor = false;
+	block->lightPos = lightPos;
+    #pragma endregion
+
+   #pragma region Draw Room
+
 	vmath::mat4 model_matrix =
-		vmath::rotate((float)currentTime * 14.5f, 0.0f, 1.0f, 0.0f) *
+		//vmath::rotate((float)currentTime * 14.5f, 0.0f, 1.0f, 0.0f) *
 		vmath::rotate(45.0f, 0.0f, 1.0f, 0.0f)*
-		vmath::scale(fScale);
+		vmath::scale(22.0f);
 
 	block->mv_matrix = view_matrix * model_matrix;
 	block->view_matrix = view_matrix;
-	block->proj_matrix = perspective_matrix;
+	
+	glCullFace(GL_FRONT);
+	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
 
+	#pragma endregion
+
+    #pragma region Draw Cube
 	glUnmapBuffer(GL_UNIFORM_BUFFER); //release the mapping of a buffer object's data store into the client's address space
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
+	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
 
-	glBindBuffer(GL_ARRAY_BUFFER, buffer); 
-	glEnableVertexAttribArray(0); //enable or disable a generic vertex attribute array
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
-	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices); //void glDrawArrays(GLenum mode, GLint first, GLsizei count); specifies multiple geometric primitives with very few subroutine calls.
+	model_matrix =
+		vmath::rotate(0.0f, 0.0f, 1.0f, 0.0f) *
+		vmath::translate(10.0f, -17.5f, -1.0f) *
+		vmath::scale(5.0f);
+
+	block->mv_matrix =  view_matrix * model_matrix;
+	block->view_matrix = view_matrix;
+
+	glCullFace(GL_BACK);
+	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
+    #pragma endregion
+
+    #pragma region Draw Sphere
+	glUnmapBuffer(GL_UNIFORM_BUFFER); //release the mapping of a buffer object's data store into the client's address space
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
+	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
+
+	model_matrix =
+		vmath::rotate(45.0f, 0.0f, 1.0f, 0.0f) *
+		vmath::translate(-10.0f, -17.5f, -2.0f) *
+		vmath::scale(5.0f);
+
+	block->uni_color = orange;
+	block->mv_matrix = view_matrix * model_matrix;
+	block->view_matrix = view_matrix;
+	block->useUniformColor = useUniformColor;
+
+	glCullFace(GL_BACK);
+	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
+    #pragma endregion
+
+
+//#if defined(MANY_OBJECTS)
+//	int i, j;
+//
+//	for (j = 0; j < 7; j++)
+//	{
+//		for (i = 0; i < 7; i++)
+//		{
+//			glUnmapBuffer(GL_UNIFORM_BUFFER);
+//			glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
+//			block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER,
+//				0,
+//				sizeof(uniforms_block),
+//				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+//
+//			model_matrix = vmath::translate((float)i * 2.75f - 8.25f, 6.75f - (float)j * 2.25f, 0.0f);
+//
+//			block->uni_color = gray;
+//			block->mv_matrix = view_matrix * model_matrix;
+//			block->view_matrix = view_matrix;
+//
+//			glUnmapBuffer(GL_UNIFORM_BUFFER);
+//
+//			glUniform1f(uniforms[per_vertex ? 1 : 0].specular_power, powf(2.0f, (float)j + 2.0f));
+//			glUniform3fv(uniforms[per_vertex ? 1 : 0].specular_albedo, 1, vmath::vec3((float)i / 9.0f + 1.0f / 9.0f));
+//
+//			object.render();
+//		}
+//	}
+//#else
+//	glUnmapBuffer(GL_UNIFORM_BUFFER); //release the mapping of a buffer object's data store into the client's address space
+//	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
+//	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
+//
+//	model_matrix = vmath::scale(7.0f);
+//
+//	block->uni_color = purple;
+//	block->mv_matrix = view_matrix * model_matrix;
+//	block->view_matrix = view_matrix;
+//
+//	glUnmapBuffer(GL_UNIFORM_BUFFER);
+//
+//	glUniform1f(uniforms[per_vertex ? 1 : 0].specular_power, 30.0f);
+//	glUniform3fv(uniforms[per_vertex ? 1 : 0].specular_albedo, 1, vmath::vec3(1.0f));
+//
+//	object.render();
+//#endif
+
 }
 
 void assignment1_app::load_shaders()
@@ -443,8 +573,8 @@ void assignment1_app::load_shaders()
 	GLuint vs;
 	GLuint fs;
 
-	//vs = sb7::shader::load("media/shaders/phonglighting/per-fragment-phong.vs.glsl", GL_VERTEX_SHADER);
-	//fs = sb7::shader::load("media/shaders/phonglighting/per-fragment-phong.fs.glsl", GL_FRAGMENT_SHADER);
+	vs = sb7::shader::load("phong_perfragment.vs.txt", GL_VERTEX_SHADER);
+	fs = sb7::shader::load("phong_perfragment.fs.txt", GL_FRAGMENT_SHADER);
 
 	if (per_fragment_program)
 	{
@@ -453,16 +583,16 @@ void assignment1_app::load_shaders()
 		
 
 	per_fragment_program = glCreateProgram();
-	//glAttachShader(per_fragment_program, vs);
-	//glAttachShader(per_fragment_program, fs);
+	glAttachShader(per_fragment_program, vs);
+	glAttachShader(per_fragment_program, fs);
 	glLinkProgram(per_fragment_program);
 
 	uniforms[0].diffuse_albedo = glGetUniformLocation(per_fragment_program, "diffuse_albedo");
 	uniforms[0].specular_albedo = glGetUniformLocation(per_fragment_program, "specular_albedo");
 	uniforms[0].specular_power = glGetUniformLocation(per_fragment_program, "specular_power");
 
-	//vs = sb7::shader::load("media/shaders/phonglighting/per-vertex-phong.vs.glsl", GL_VERTEX_SHADER);
-	//fs = sb7::shader::load("media/shaders/phonglighting/per-vertex-phong.fs.glsl", GL_FRAGMENT_SHADER);
+	vs = sb7::shader::load("phong_pervertex.vs.txt", GL_VERTEX_SHADER);
+	fs = sb7::shader::load("phong_pervertex.fs.txt", GL_FRAGMENT_SHADER);
 
 	if (per_vertex_program)
 	{
@@ -470,8 +600,8 @@ void assignment1_app::load_shaders()
 	}
 
 	per_vertex_program = glCreateProgram();
-	//glAttachShader(per_vertex_program, vs);
-	//glAttachShader(per_vertex_program, fs);
+	glAttachShader(per_vertex_program, vs);
+	glAttachShader(per_vertex_program, fs);
 	glLinkProgram(per_vertex_program);
 
 	uniforms[1].diffuse_albedo = glGetUniformLocation(per_vertex_program, "diffuse_albedo");
@@ -502,6 +632,10 @@ void assignment1_app::onKey(int key, int action)
                 break;
 			case 'V':
 				per_vertex = !per_vertex;
+				break;
+			case 'C':
+				// Provide a ‘C’ key to switch between colors in the vertex attribute to a constant color for shading the sphere.
+				useUniformColor = !useUniformColor;
 				break;
 		}
     }
