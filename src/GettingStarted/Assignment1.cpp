@@ -369,7 +369,7 @@ void assignment1_app::startup()
 
 	useUniformColor = false;
 
-	//object.load("bin\\media\\objects\\dragon.sbm");
+	object.load("bin\\media\\objects\\sphere.sbm");
 }
 
 void assignment1_app::render(double currentTime)
@@ -519,52 +519,52 @@ void assignment1_app::render(double currentTime)
 	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
     #pragma endregion
 
-//#if defined(MANY_OBJECTS)
-//	int i, j;
-//
-//	for (j = 0; j < 7; j++)
-//	{
-//		for (i = 0; i < 7; i++)
-//		{
-//			glUnmapBuffer(GL_UNIFORM_BUFFER);
-//			glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
-//			block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER,
-//				0,
-//				sizeof(uniforms_block),
-//				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-//
-//			model_matrix = vmath::translate((float)i * 2.75f - 8.25f, 6.75f - (float)j * 2.25f, 0.0f);
-//
-//			block->uni_color = gray;
-//			block->mv_matrix = view_matrix * model_matrix;
-//			block->view_matrix = view_matrix;
-//
-//			glUnmapBuffer(GL_UNIFORM_BUFFER);
-//
-//			glUniform1f(uniforms[per_vertex ? 1 : 0].specular_power, powf(2.0f, (float)j + 2.0f));
-//			glUniform3fv(uniforms[per_vertex ? 1 : 0].specular_albedo, 1, vmath::vec3((float)i / 9.0f + 1.0f / 9.0f));
-//
-//			object.render();
-//		}
-//	}
-//#else
-//	glUnmapBuffer(GL_UNIFORM_BUFFER); //release the mapping of a buffer object's data store into the client's address space
-//	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
-//	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
-//
-//	model_matrix = vmath::scale(7.0f);
-//
-//	block->uni_color = purple;
-//	block->mv_matrix = view_matrix * model_matrix;
-//	block->view_matrix = view_matrix;
-//
-//	glUnmapBuffer(GL_UNIFORM_BUFFER);
-//
-//	glUniform1f(uniforms[per_vertex ? 1 : 0].specular_power, 30.0f);
-//	glUniform3fv(uniforms[per_vertex ? 1 : 0].specular_albedo, 1, vmath::vec3(1.0f));
-//
-//	object.render();
-//#endif
+#if defined(MANY_OBJECTS)
+	int i, j;
+
+	for (j = 0; j < 7; j++)
+	{
+		for (i = 0; i < 7; i++)
+		{
+			glUnmapBuffer(GL_UNIFORM_BUFFER);
+			glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
+			block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER,
+				0,
+				sizeof(uniforms_block),
+				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+
+			model_matrix = vmath::translate((float)i * 2.75f - 8.25f, 6.75f - (float)j * 2.25f, 0.0f);
+
+			block->uni_color = gray;
+			block->mv_matrix = view_matrix * model_matrix;
+			block->view_matrix = view_matrix;
+
+			glUnmapBuffer(GL_UNIFORM_BUFFER);
+
+			glUniform1f(uniforms[per_vertex ? 1 : 0].specular_power, powf(2.0f, (float)j + 2.0f));
+			glUniform3fv(uniforms[per_vertex ? 1 : 0].specular_albedo, 1, vmath::vec3((float)i / 9.0f + 1.0f / 9.0f));
+
+			object.render();
+		}
+	}
+#else
+	glUnmapBuffer(GL_UNIFORM_BUFFER); //release the mapping of a buffer object's data store into the client's address space
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
+	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
+
+	model_matrix = vmath::scale(7.0f);
+
+	block->uni_color = purple;
+	block->mv_matrix = view_matrix * model_matrix;
+	block->view_matrix = view_matrix;
+
+	glUnmapBuffer(GL_UNIFORM_BUFFER);
+
+	glUniform1f(uniforms[per_vertex ? 1 : 0].specular_power, 30.0f);
+	glUniform3fv(uniforms[per_vertex ? 1 : 0].specular_albedo, 1, vmath::vec3(1.0f));
+
+	object.render();
+#endif
 
 }
 

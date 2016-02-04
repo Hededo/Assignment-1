@@ -270,10 +270,10 @@
     <ClCompile Include="src\GettingStarted\Assignment1.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="phong_perfragment.fs.txt" />
-    <Text Include="phong_perfragment.vs.txt" />
-    <Text Include="phong_pervertex.fs.txt" />
-    <Text Include="phong_pervertex.vs.txt" />
+    <Text Include="bin\media\shaders\assignment1_phong\phong_perfragment.fs.txt" />
+    <Text Include="bin\media\shaders\assignment1_phong\phong_perfragment.vs.txt" />
+    <Text Include="bin\media\shaders\assignment1_phong\phong_pervertex.fs.txt" />
+    <Text Include="bin\media\shaders\assignment1_phong\phong_pervertex.vs.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

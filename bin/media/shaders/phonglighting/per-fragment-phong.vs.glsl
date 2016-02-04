@@ -1,7 +1,5 @@
 #version 410 core
 
-// Code is modified from OpenGL SuperBible example
-
 // Per-vertex inputs
 layout (location = 0) in vec4 position;
 layout (location = 1) in vec3 normal;
@@ -14,18 +12,16 @@ layout (std140) uniform constants
     mat4 proj_matrix;
 };
 
-// Outputs to Fragment Shader
+// Inputs from vertex shader
 out VS_OUT
 {
     vec3 N;
     vec3 L;
     vec3 V;
-	vec3 color;
 } vs_out;
 
 // Position of light
-uniform vec3 light_pos = vec3(0.0,0.0,0.0);
-uniform int oneColor = 0;
+uniform vec3 light_pos = vec3(100.0, 100.0, 100.0);
 
 void main(void)
 {
@@ -40,15 +36,6 @@ void main(void)
 
     // Calculate view vector
     vs_out.V = -P.xyz;
-
-	if(oneColor == 0)
-	{
-		vs_out.color = vec3(position * 2.0 + vec4(0.5, 0.5, 0.5, 0.0));
-	}
-	else
-	{
-		vs_out.color = vec3(0.839, 0.753, 0.69);
-	}
 
     // Calculate the clip-space position of each vertex
     gl_Position = proj_matrix * P;
