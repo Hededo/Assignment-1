@@ -103,7 +103,10 @@ protected:
 	const GLfloat green[4] = { 0.0f, 0.25f, 0.0f, 1.0f };
 	const GLfloat skyBlue[4] = { 0.529f, 0.808f, 0.922f, 1.0f };
 	const GLfloat ones[4] = { 1.0f, 1.0f, 1.0f, 1.0f};
+<<<<<<< HEAD
 	const vmath::vec4 white = vmath::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+=======
+>>>>>>> 1d8fe25d4b97b18d114095d2f6ad9300071d8b9c
 	const vmath::vec4 orange = vmath::vec4(1.0f, 0.5f, 0.0f, 1.0f);
 	const vmath::vec4 purple = vmath::vec4(1.0f, 0.0f, 1.0f, 1.0f);
 	const vmath::vec4 gray = vmath::vec4(0.8f, 0.8f, 0.8f, 1.0f);
@@ -236,16 +239,28 @@ protected:
 		0.0f,  0.0f,  1.0f, 1.0f,
 		0.0f,  0.0f,  1.0f, 1.0f,
 		0.0f,  0.0f,  1.0f, 1.0f,
+<<<<<<< HEAD
 
 		//R (Red)
 		1.0f,  0.0f,  0.0f,  1.0f,
 		1.0f,  0.0f,  0.0f,  1.0f,
 		1.0f,  0.0f,  0.0f,  1.0f,
 
+=======
+
+		//R (Red)
+>>>>>>> 1d8fe25d4b97b18d114095d2f6ad9300071d8b9c
 		1.0f,  0.0f,  0.0f,  1.0f,
 		1.0f,  0.0f,  0.0f,  1.0f,
 		1.0f,  0.0f,  0.0f,  1.0f,
 
+<<<<<<< HEAD
+=======
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+		1.0f,  0.0f,  0.0f,  1.0f,
+
+>>>>>>> 1d8fe25d4b97b18d114095d2f6ad9300071d8b9c
 		//F (Green)
 		0.0f,  0.0f,  -1.0f, 1.0f,
 		0.0f,  0.0f,  -1.0f, 1.0f,
@@ -368,8 +383,11 @@ void assignment1_app::startup()
     #pragma endregion
 
 	useUniformColor = false;
+<<<<<<< HEAD
 
 	//object.load("bin\\media\\objects\\dragon.sbm");
+=======
+>>>>>>> 1d8fe25d4b97b18d114095d2f6ad9300071d8b9c
 }
 
 void assignment1_app::render(double currentTime)
@@ -462,7 +480,11 @@ void assignment1_app::render(double currentTime)
 
     #pragma region Uniforms that remain constant
 	block->proj_matrix = perspective_matrix;
+<<<<<<< HEAD
 	block->uni_color = white; 
+=======
+	block->uni_color = orange; 
+>>>>>>> 1d8fe25d4b97b18d114095d2f6ad9300071d8b9c
 	block->useUniformColor = false;
 	block->lightPos = lightPos;
     #pragma endregion
@@ -488,7 +510,11 @@ void assignment1_app::render(double currentTime)
 	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
 
 	model_matrix =
+<<<<<<< HEAD
 		vmath::rotate(0.0f, 0.0f, 1.0f, 0.0f) *
+=======
+		vmath::rotate(0.0f, 0.0f, 1.0f, 0.0f)*
+>>>>>>> 1d8fe25d4b97b18d114095d2f6ad9300071d8b9c
 		vmath::translate(10.0f, -17.5f, -1.0f) *
 		vmath::scale(5.0f);
 
@@ -505,11 +531,18 @@ void assignment1_app::render(double currentTime)
 	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
 
 	model_matrix =
+<<<<<<< HEAD
 		vmath::rotate(45.0f, 0.0f, 1.0f, 0.0f) *
 		vmath::translate(-10.0f, -17.5f, -2.0f) *
 		vmath::scale(5.0f);
 
 	block->uni_color = orange;
+=======
+		vmath::rotate(45.0f, 0.0f, 1.0f, 0.0f)*
+		vmath::translate(-10.0f, -17.5f, -2.0f) *
+		vmath::scale(5.0f);
+
+>>>>>>> 1d8fe25d4b97b18d114095d2f6ad9300071d8b9c
 	block->mv_matrix = view_matrix * model_matrix;
 	block->view_matrix = view_matrix;
 	block->useUniformColor = useUniformColor;
@@ -518,6 +551,7 @@ void assignment1_app::render(double currentTime)
 	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
     #pragma endregion
 
+<<<<<<< HEAD
 
 //#if defined(MANY_OBJECTS)
 //	int i, j;
@@ -565,6 +599,8 @@ void assignment1_app::render(double currentTime)
 //
 //	object.render();
 //#endif
+=======
+>>>>>>> 1d8fe25d4b97b18d114095d2f6ad9300071d8b9c
 
 }
 

@@ -1,2 +1,6 @@
 #TargetFrameworkVersion=v4.0:PlatformToolSet=v140:EnableManagedIncrementalBuild=false:VCToolArchitecture=Native32Bit:WindowsTargetPlatformVersion=8.1
+<<<<<<< HEAD
 Debug|Win32|C:\Users\jon\Dropbox\_utah\Semesters\Senior Year 2015-2016\Spring 2016\CS5610\Assignment 1\Assigment1\|
+=======
+Debug|Win32|D:\Local Docs\Code\CS 5610\Skoo\|
+>>>>>>> 1d8fe25d4b97b18d114095d2f6ad9300071d8b9c
