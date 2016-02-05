@@ -1,24 +1,25 @@
 #version 410 core                                                  
 // Per-vertex inputs                                                
-layout (location = 0) in vec4 position;                            
-layout (location = 1) in vec4 color;                            
-layout (location = 2) in vec4 normal;                           
+layout (location = 0) in vec4 position;   
+layout (location = 1) in vec4 normal;                          
+layout (location = 2) in vec4 color;                            
+                          
 																	
 layout(std140) uniform constants									
 {																	
 	mat4 mv_matrix;													
 	mat4 view_matrix;												
 	mat4 proj_matrix;												
-	vec4 uni_color;										     		
-	bool useUniformColor;
-	vec3 light_pos;										     
+	vec4 uni_color;		
+	vec3 light_pos;									     		
+	bool useUniformColor;									     
 };		
 
 // Light and material properties
 uniform vec3 diffuse_albedo = vec3(0.5, 0.2, 0.7);
 uniform vec3 specular_albedo = vec3(0.7);
 uniform float specular_power = 128.0;
-uniform vec3 ambient = vec3(0.2, 0.2, 0.2);													                                                         
+uniform vec3 ambient = vec3(0.3, 0.2, 0.2);													                                                         
 out VS_OUT                                                         
 {                                                                 
     vec3 color;                                                    

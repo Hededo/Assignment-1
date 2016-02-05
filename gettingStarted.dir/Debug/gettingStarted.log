@@ -1,1 +1,3 @@
-﻿  gettingStarted.vcxproj -> D:\Local Docs\Code\CS 5610\Skoo\bin\gettingStarted_d.exe
+﻿  Assignment1.cpp
+C:\VersionedCode\Skoo\include\vmath.h(1022): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  gettingStarted.vcxproj -> C:\VersionedCode\Skoo\bin\gettingStarted_d.exe

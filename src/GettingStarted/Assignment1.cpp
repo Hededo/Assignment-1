@@ -64,9 +64,9 @@ protected:
         vmath::mat4     view_matrix;
         vmath::mat4     proj_matrix;
 		vmath::vec4     uni_color;
-		bool		    useUniformColor;
 		vmath::vec3     lightPos;
-		vmath::vec3		diffuse_albedo;
+		bool		    useUniformColor;
+		bool			isSphere;
     };
 
     GLuint          uniforms_buffer;
@@ -112,8 +112,7 @@ protected:
 #pragma region Vertex Data
     static const int numberOfVertices = 36;
 	static const int numberOfVerticeComponents = numberOfVertices * 4;
-    const GLfloat cube_data[numberOfVerticeComponents] =
-	{
+    const GLfloat cube_data[numberOfVerticeComponents] = {
 		//B
 		-1.0f, 1.0f, -1.0f, 1.0f,
 		-1.0f, -1.0f, -1.0f, 1.0f,
@@ -229,13 +228,13 @@ protected:
 
 	const GLfloat normals_data[numberOfVerticeComponents] = {
 		//B (Green)
-		0.0f,  0.0f,  1.0f, 1.0f,
-		0.0f,  0.0f,  1.0f, 1.0f,
-		0.0f,  0.0f,  1.0f, 1.0f,
+		0.0f,  0.0f,  -1.0f, 1.0f,
+		0.0f,  0.0f,  -1.0f, 1.0f,
+		0.0f,  0.0f,  -1.0f, 1.0f,
 
-		0.0f,  0.0f,  1.0f, 1.0f,
-		0.0f,  0.0f,  1.0f, 1.0f,
-		0.0f,  0.0f,  1.0f, 1.0f,
+		0.0f,  0.0f,  -1.0f, 1.0f,
+		0.0f,  0.0f,  -1.0f, 1.0f,
+		0.0f,  0.0f,  -1.0f, 1.0f,
 
 		//R (Red)
 		1.0f,  0.0f,  0.0f,  1.0f,
@@ -247,13 +246,13 @@ protected:
 		1.0f,  0.0f,  0.0f,  1.0f,
 
 		//F (Green)
-		0.0f,  0.0f,  -1.0f, 1.0f,
-		0.0f,  0.0f,  -1.0f, 1.0f,
-		0.0f,  0.0f,  -1.0f, 1.0f,
+		0.0f,  0.0f,  1.0f, 1.0f,
+		0.0f,  0.0f,  1.0f, 1.0f,
+		0.0f,  0.0f,  1.0f, 1.0f,
 
-		0.0f,  0.0f,  -1.0f, 1.0f,
-		0.0f,  0.0f,  -1.0f, 1.0f,
-		0.0f,  0.0f,  -1.0f, 1.0f,
+		0.0f,  0.0f,  1.0f, 1.0f,
+		0.0f,  0.0f,  1.0f, 1.0f,
+		0.0f,  0.0f,  1.0f, 1.0f,
 
 		//L (Red)
 		-1.0f,  0.0f,  0.0f,  1.0f,
@@ -265,22 +264,22 @@ protected:
 		-1.0f,  0.0f,  0.0f,  1.0f,
 
 		//D (Blue)
-		0.0f, 1.0f, 0.0f, 1.0f,
-		0.0f, 1.0f, 0.0f, 1.0f,
-		0.0f, 1.0f, 0.0f, 1.0f,
+		0.0f, -1.0f, 0.0f, 1.0f,
+		0.0f, -1.0f, 0.0f, 1.0f,
+		0.0f, -1.0f, 0.0f, 1.0f,
 
-		0.0f, 1.0f, 0.0f, 1.0f,
-		0.0f, 1.0f, 0.0f, 1.0f,
-		0.0f, 1.0f, 0.0f, 1.0f,
+		0.0f, -1.0f, 0.0f, 1.0f,
+		0.0f, -1.0f, 0.0f, 1.0f,
+		0.0f, -1.0f, 0.0f, 1.0f,
 
 		//U
-		0.0f, -1.0f, 0.0f, 1.0f,
-		0.0f, -1.0f, 0.0f, 1.0f,
-		0.0f, -1.0f, 0.0f, 1.0f,
+		0.0f, 1.0f, 0.0f, 1.0f,
+		0.0f, 1.0f, 0.0f, 1.0f,
+		0.0f, 1.0f, 0.0f, 1.0f,
 
-		0.0f, -1.0f, 0.0f, 1.0f,
-		0.0f, -1.0f, 0.0f, 1.0f,
-		0.0f, -1.0f, 0.0f, 1.0f,
+		0.0f, 1.0f, 0.0f, 1.0f,
+		0.0f, 1.0f, 0.0f, 1.0f,
+		0.0f, 1.0f, 0.0f, 1.0f,
 		//End Cube
 	};
 #pragma endregion
@@ -313,6 +312,7 @@ private:
 	GLuint colorBuffer;
 	GLuint normalsBuffer;
 	GLuint vao2;
+	GLuint sphere_vao;
 #pragma endregion
 };
 
@@ -359,17 +359,20 @@ void assignment1_app::startup()
     glBufferData(GL_UNIFORM_BUFFER, sizeof(uniforms_block), NULL, GL_DYNAMIC_DRAW);
     #pragma endregion
 
-    #pragma region OPENGL Settings
+	useUniformColor = false;
+
+	glGenVertexArrays(1, &sphere_vao);
+	glBindVertexArray(sphere_vao);
+	object.load("bin\\media\\objects\\sphere.sbm");
+
+#pragma region OPENGL Settings
 
 	glEnable(GL_CULL_FACE); // Use face culling to see into the room.
 	glFrontFace(GL_CW); //glFrontFace(GLenum mode) In a scene composed entirely of opaque closed surfaces, back-facing polygons are never visible.
-    glEnable(GL_DEPTH_TEST); //glEnable(GLenum cap) glEnable and glDisable enable and disable various capabilities.
-    glDepthFunc(GL_LEQUAL);	//glDepthFunc(GLenum func) specifies the function used to compare each incoming pixel depth value with the depth value present in the depth buffer. 
-    #pragma endregion
+	glEnable(GL_DEPTH_TEST); //glEnable(GLenum cap) glEnable and glDisable enable and disable various capabilities.
+	glDepthFunc(GL_LEQUAL);	//glDepthFunc(GLenum func) specifies the function used to compare each incoming pixel depth value with the depth value present in the depth buffer. 
+#pragma endregion
 
-	useUniformColor = false;
-
-	object.load("bin\\media\\objects\\sphere.sbm");
 }
 
 void assignment1_app::render(double currentTime)
@@ -452,24 +455,53 @@ void assignment1_app::render(double currentTime)
 	glEnableVertexAttribArray(0); //enable or disable a generic vertex attribute array
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
 
-	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, normalsBuffer);
 	glEnableVertexAttribArray(1); //enable or disable a generic vertex attribute array
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
 
-	glBindBuffer(GL_ARRAY_BUFFER, normalsBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
 	glEnableVertexAttribArray(2); //enable or disable a generic vertex attribute array
 	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
 
-    #pragma region Uniforms that remain constant
+#pragma region Uniforms that remain constant for all geometery
 	block->proj_matrix = perspective_matrix;
-	block->uni_color = white; 
-	block->useUniformColor = false;
 	block->lightPos = lightPos;
-    #pragma endregion
+#pragma endregion
+
+#pragma region Draw Sphere
+	glBindVertexArray(sphere_vao);
+	glUnmapBuffer(GL_UNIFORM_BUFFER);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
+
+	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
+	vmath::mat4 model_matrix = 
+		vmath::translate(0.0f, 0.0f, 0.0f) *
+		vmath::scale(1.0f);
+	block->uni_color = purple;
+	block->mv_matrix = view_matrix * model_matrix;
+	block->view_matrix = view_matrix;
+	block->isSphere = true;
+	block->useUniformColor = useUniformColor;
+
+	glUnmapBuffer(GL_UNIFORM_BUFFER);
+
+	glUniform1f(uniforms[per_vertex ? 1 : 0].specular_power, 30.0f);
+	glUniform3fv(uniforms[per_vertex ? 1 : 0].specular_albedo, 1, vmath::vec3(1.0f));
+
+	glCullFace(GL_BACK);
+	object.render();
+#pragma endregion
+
+#pragma region Uniforms that remain constant for cubes
+	block->isSphere = false;
+	block->useUniformColor = false;
+#pragma endregion
+
+	glBindVertexArray(vao2);
 
    #pragma region Draw Room
 
-	vmath::mat4 model_matrix =
+	model_matrix =
 		//vmath::rotate((float)currentTime * 14.5f, 0.0f, 1.0f, 0.0f) *
 		vmath::rotate(45.0f, 0.0f, 1.0f, 0.0f)*
 		vmath::scale(22.0f);
@@ -498,74 +530,6 @@ void assignment1_app::render(double currentTime)
 	glCullFace(GL_BACK);
 	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
     #pragma endregion
-
-    #pragma region Draw Sphere
-	glUnmapBuffer(GL_UNIFORM_BUFFER); //release the mapping of a buffer object's data store into the client's address space
-	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
-	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
-
-	model_matrix =
-		vmath::rotate(45.0f, 0.0f, 1.0f, 0.0f) *
-		vmath::translate(-10.0f, -17.5f, -2.0f) *
-		vmath::scale(5.0f);
-
-	block->uni_color = orange;
-
-	block->mv_matrix = view_matrix * model_matrix;
-	block->view_matrix = view_matrix;
-	block->useUniformColor = useUniformColor;
-
-	glCullFace(GL_BACK);
-	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
-    #pragma endregion
-
-#if defined(MANY_OBJECTS)
-	int i, j;
-
-	for (j = 0; j < 7; j++)
-	{
-		for (i = 0; i < 7; i++)
-		{
-			glUnmapBuffer(GL_UNIFORM_BUFFER);
-			glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
-			block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER,
-				0,
-				sizeof(uniforms_block),
-				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-
-			model_matrix = vmath::translate((float)i * 2.75f - 8.25f, 6.75f - (float)j * 2.25f, 0.0f);
-
-			block->uni_color = gray;
-			block->mv_matrix = view_matrix * model_matrix;
-			block->view_matrix = view_matrix;
-
-			glUnmapBuffer(GL_UNIFORM_BUFFER);
-
-			glUniform1f(uniforms[per_vertex ? 1 : 0].specular_power, powf(2.0f, (float)j + 2.0f));
-			glUniform3fv(uniforms[per_vertex ? 1 : 0].specular_albedo, 1, vmath::vec3((float)i / 9.0f + 1.0f / 9.0f));
-
-			object.render();
-		}
-	}
-#else
-	glUnmapBuffer(GL_UNIFORM_BUFFER); //release the mapping of a buffer object's data store into the client's address space
-	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
-	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
-
-	model_matrix = vmath::scale(7.0f);
-
-	block->uni_color = purple;
-	block->mv_matrix = view_matrix * model_matrix;
-	block->view_matrix = view_matrix;
-
-	glUnmapBuffer(GL_UNIFORM_BUFFER);
-
-	glUniform1f(uniforms[per_vertex ? 1 : 0].specular_power, 30.0f);
-	glUniform3fv(uniforms[per_vertex ? 1 : 0].specular_albedo, 1, vmath::vec3(1.0f));
-
-	object.render();
-#endif
-
 }
 
 void assignment1_app::load_shaders()
