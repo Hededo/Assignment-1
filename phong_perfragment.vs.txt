@@ -16,6 +16,7 @@ layout (std140) uniform constants
 	vec4 uni_color;		
 	vec3 light_pos;									     		
 	bool useUniformColor;	
+	bool invertNormals;
 };
 
 // Outputs to Fragment Shader
@@ -29,11 +30,16 @@ out VS_OUT
 
 void main(void)
 {
+	vec3 adjustedNormal = normal;
+	if (invertNormals) 
+	{
+	   adjustedNormal = -normal;
+	}                   
     // Calculate view-space coordinate
     vec4 P = mv_matrix * position;
 
     // Calculate normal in view-space
-    vs_out.N = mat3(mv_matrix) * normal;
+    vs_out.N = mat3(mv_matrix) * adjustedNormal;
 
     // Calculate light vector
     vs_out.L = light_pos - P.xyz;

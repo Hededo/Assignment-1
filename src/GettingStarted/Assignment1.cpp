@@ -66,7 +66,7 @@ protected:
 		vmath::vec4     uni_color;
 		vmath::vec3     lightPos;
 		bool		    useUniformColor;
-		bool			isSphere;
+		bool			invertNormals;
     };
 
     GLuint          uniforms_buffer;
@@ -311,7 +311,7 @@ private:
 	GLuint buffer;
 	GLuint colorBuffer;
 	GLuint normalsBuffer;
-	GLuint vao2;
+	GLuint cube_vao;
 	GLuint sphere_vao;
 #pragma endregion
 };
@@ -320,8 +320,8 @@ void assignment1_app::startup()
 {
 	load_shaders();
 
-	glGenVertexArrays(1, &vao2);  //glGenVertexArrays(n, &array) returns n vertex array object names in arrays
-	glBindVertexArray(vao2); //glBindVertexArray(array) binds the vertex array object with name array.
+	glGenVertexArrays(1, &cube_vao);  //glGenVertexArrays(n, &array) returns n vertex array object names in arrays
+	glBindVertexArray(cube_vao); //glBindVertexArray(array) binds the vertex array object with name array.
 
     #pragma region Buffer
 	glGenBuffers(1, &buffer);
@@ -333,7 +333,7 @@ void assignment1_app::startup()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
    #pragma endregion
 
-#pragma region Color Buffer
+    #pragma region Color Buffer
 	glGenBuffers(1, &colorBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
 	glBufferData(GL_ARRAY_BUFFER,
@@ -343,7 +343,7 @@ void assignment1_app::startup()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 #pragma endregion
 
-#pragma region Normals Buffer
+    #pragma region Normals Buffer
 	glGenBuffers(1, &normalsBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, normalsBuffer);
 	glBufferData(GL_ARRAY_BUFFER,
@@ -463,12 +463,12 @@ void assignment1_app::render(double currentTime)
 	glEnableVertexAttribArray(2); //enable or disable a generic vertex attribute array
 	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
 
-#pragma region Uniforms that remain constant for all geometery
+    #pragma region Uniforms that remain constant for all geometery
 	block->proj_matrix = perspective_matrix;
 	block->lightPos = lightPos;
-#pragma endregion
+    #pragma endregion
 
-#pragma region Draw Sphere
+    #pragma region Draw Sphere
 	glBindVertexArray(sphere_vao);
 	glUnmapBuffer(GL_UNIFORM_BUFFER);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
@@ -480,8 +480,8 @@ void assignment1_app::render(double currentTime)
 	block->uni_color = purple;
 	block->mv_matrix = view_matrix * model_matrix;
 	block->view_matrix = view_matrix;
-	block->isSphere = true;
 	block->useUniformColor = useUniformColor;
+	block->invertNormals = false;
 
 	glUnmapBuffer(GL_UNIFORM_BUFFER);
 
@@ -493,11 +493,13 @@ void assignment1_app::render(double currentTime)
 #pragma endregion
 
 #pragma region Uniforms that remain constant for cubes
-	block->isSphere = false;
 	block->useUniformColor = false;
+	block->uni_color = white;
 #pragma endregion
 
-	glBindVertexArray(vao2);
+	glBindVertexArray(cube_vao);
+	glUnmapBuffer(GL_UNIFORM_BUFFER);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
 
    #pragma region Draw Room
 
@@ -508,6 +510,7 @@ void assignment1_app::render(double currentTime)
 
 	block->mv_matrix = view_matrix * model_matrix;
 	block->view_matrix = view_matrix;
+	block->invertNormals = false;
 	
 	glCullFace(GL_FRONT);
 	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
@@ -526,6 +529,7 @@ void assignment1_app::render(double currentTime)
 
 	block->mv_matrix =  view_matrix * model_matrix;
 	block->view_matrix = view_matrix;
+	block->invertNormals = true;
 
 	glCullFace(GL_BACK);
 	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);

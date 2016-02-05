@@ -2,7 +2,7 @@
 // Per-vertex inputs                                                
 layout (location = 0) in vec4 position;   
 layout (location = 1) in vec4 normal;                          
-layout (location = 2) in vec4 color;                            
+layout (location = 2) in vec4 attributeColor;                            
                           
 																	
 layout(std140) uniform constants									
@@ -12,14 +12,16 @@ layout(std140) uniform constants
 	mat4 proj_matrix;												
 	vec4 uni_color;		
 	vec3 light_pos;									     		
-	bool useUniformColor;									     
+	bool useUniformColor;
+	bool invertNormals;								     
 };		
 
 // Light and material properties
 uniform vec3 diffuse_albedo = vec3(0.5, 0.2, 0.7);
 uniform vec3 specular_albedo = vec3(0.7);
 uniform float specular_power = 128.0;
-uniform vec3 ambient = vec3(0.3, 0.2, 0.2);													                                                         
+uniform vec3 ambient = vec3(0.3, 0.2, 0.2);			
+										                                                         
 out VS_OUT                                                         
 {                                                                 
     vec3 color;                                                    
@@ -27,11 +29,16 @@ out VS_OUT
                                                                    
                                                                  
 void main(void)                                                    
-{                                                                 
+{    
+    vec4 adjustedNormal = normal;
+	if (invertNormals) 
+	{
+	   adjustedNormal = -normal;
+	}                                                    
     // Calculate view-space coordinate								
     vec4 P = mv_matrix * position;	
 	// Calculate normal in view space
-    vec4 N = mv_matrix * normal;
+    vec4 N = mv_matrix * adjustedNormal;
 	// Calculate view-space light vector
     vec3 L = light_pos - P.xyz;
 	// Calculate view vector (simply the negative of the view-space position)
@@ -49,8 +56,8 @@ void main(void)
 	vec3 specular = pow(max(dot(R, V), 0.0), specular_power) * specular_albedo;
 	
 	// Send output color to fragment shader
-    vs_out.color = (ambient + diffuse + specular)*color.xyz;
-								
+	vs_out.color = (ambient + diffuse + specular)*attributeColor.xyz;
+							
     if (useUniformColor)								
     {                               							
        vs_out.color = (ambient + diffuse + specular)*uni_color.xyz;		
