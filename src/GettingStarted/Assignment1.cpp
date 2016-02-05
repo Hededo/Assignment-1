@@ -64,19 +64,12 @@ protected:
         vmath::mat4     view_matrix;
         vmath::mat4     proj_matrix;
 		vmath::vec4     uni_color;
-		vmath::vec3     lightPos;
-		bool		    useUniformColor;
-		bool			invertNormals;
+		vmath::vec4     lightPos;
+		bool	        useUniformColor;
+		bool	        invertNormals;
     };
 
     GLuint          uniforms_buffer;
-
-	struct
-	{
-		GLint           diffuse_albedo;
-		GLint           specular_albedo;
-		GLint           specular_power;
-	} uniforms[2];
 
 	sb7::object     object;
 
@@ -99,8 +92,6 @@ protected:
 	vmath::mat4 translationMatrix = vmath::mat4::identity();
 
     #pragma region Colors
-    const GLfloat zeros[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	const GLfloat green[4] = { 0.0f, 0.25f, 0.0f, 1.0f };
 	const GLfloat skyBlue[4] = { 0.529f, 0.808f, 0.922f, 1.0f };
 	const GLfloat ones[4] = { 1.0f, 1.0f, 1.0f, 1.0f};
 	const vmath::vec4 white = vmath::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -306,7 +297,7 @@ private:
 	float iLightPosX = 1.0f;
 	float iLightPosY = 0.5f;
 	float iLightPosZ = 0.0f;
-	vmath::vec3 lightPos = vmath::vec3(iLightPosX, iLightPosY, iLightPosZ);
+	vmath::vec4 lightPos = vmath::vec4(iLightPosX, iLightPosY, iLightPosZ, 1.0f);
 
 	GLuint buffer;
 	GLuint colorBuffer;
@@ -418,13 +409,15 @@ void assignment1_app::render(double currentTime)
 			translationMatrix = vmath::translate(fXpos / (info.windowWidth / fZpos), -fYpos/(info.windowWidth / fZpos), 0.0f);
 		}
 		//Light position tracks with the camera
-		lightPos = vmath::vec3(iLightPosX * translationMatrix[0][0] + iLightPosX * translationMatrix[0][1] + iLightPosX * translationMatrix[0][2],
+		lightPos = vmath::vec4(iLightPosX * translationMatrix[0][0] + iLightPosX * translationMatrix[0][1] + iLightPosX * translationMatrix[0][2],
 			iLightPosY * translationMatrix[1][0] + iLightPosY * translationMatrix[1][1] + iLightPosY * translationMatrix[1][2],
-			iLightPosZ * translationMatrix[2][0] + iLightPosZ * translationMatrix[2][1] + iLightPosZ * translationMatrix[2][2]
+			iLightPosZ * translationMatrix[2][0] + iLightPosZ * translationMatrix[2][1] + iLightPosZ * translationMatrix[2][2],
+			1.0f
 			);
-		lightPos = vmath::vec3(lightPos[0] * rotationMatrix[0][0] + lightPos[0] * rotationMatrix[0][1] + lightPos[0] * rotationMatrix[0][2],
+		lightPos = vmath::vec4(lightPos[0] * rotationMatrix[0][0] + lightPos[0] * rotationMatrix[0][1] + lightPos[0] * rotationMatrix[0][2],
 			lightPos[1] * rotationMatrix[1][0] + lightPos[1] * rotationMatrix[1][1] + lightPos[1] * rotationMatrix[1][2],
-			lightPos[2] * rotationMatrix[2][0] + lightPos[2] * rotationMatrix[2][1] + lightPos[2] * rotationMatrix[2][2]
+			lightPos[2] * rotationMatrix[2][0] + lightPos[2] * rotationMatrix[2][1] + lightPos[2] * rotationMatrix[2][2],
+			1.0f
 			);
 	}
     #pragma endregion
@@ -485,16 +478,13 @@ void assignment1_app::render(double currentTime)
 
 	glUnmapBuffer(GL_UNIFORM_BUFFER);
 
-	glUniform1f(uniforms[per_vertex ? 1 : 0].specular_power, 30.0f);
-	glUniform3fv(uniforms[per_vertex ? 1 : 0].specular_albedo, 1, vmath::vec3(1.0f));
-
 	glCullFace(GL_BACK);
 	object.render();
 #pragma endregion
 
 #pragma region Uniforms that remain constant for cubes
+	block->uni_color = orange;
 	block->useUniformColor = false;
-	block->uni_color = white;
 #pragma endregion
 
 	glBindVertexArray(cube_vao);
@@ -555,10 +545,6 @@ void assignment1_app::load_shaders()
 	glAttachShader(per_fragment_program, fs);
 	glLinkProgram(per_fragment_program);
 
-	uniforms[0].diffuse_albedo = glGetUniformLocation(per_fragment_program, "diffuse_albedo");
-	uniforms[0].specular_albedo = glGetUniformLocation(per_fragment_program, "specular_albedo");
-	uniforms[0].specular_power = glGetUniformLocation(per_fragment_program, "specular_power");
-
 	vs = sb7::shader::load("phong_pervertex.vs.txt", GL_VERTEX_SHADER);
 	fs = sb7::shader::load("phong_pervertex.fs.txt", GL_FRAGMENT_SHADER);
 
@@ -571,10 +557,6 @@ void assignment1_app::load_shaders()
 	glAttachShader(per_vertex_program, vs);
 	glAttachShader(per_vertex_program, fs);
 	glLinkProgram(per_vertex_program);
-
-	uniforms[1].diffuse_albedo = glGetUniformLocation(per_vertex_program, "diffuse_albedo");
-	uniforms[1].specular_albedo = glGetUniformLocation(per_vertex_program, "specular_albedo");
-	uniforms[1].specular_power = glGetUniformLocation(per_vertex_program, "specular_power");
 }
 
 #pragma region Event Handlers

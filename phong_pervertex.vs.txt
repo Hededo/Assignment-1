@@ -11,7 +11,7 @@ layout(std140) uniform constants
 	mat4 view_matrix;												
 	mat4 proj_matrix;												
 	vec4 uni_color;		
-	vec3 light_pos;									     		
+	vec4 light_pos;									     		
 	bool useUniformColor;
 	bool invertNormals;								     
 };		
@@ -33,14 +33,14 @@ void main(void)
     vec4 adjustedNormal = normal;
 	if (invertNormals) 
 	{
-	   adjustedNormal = -normal;
+	   adjustedNormal = -normal; //invert normals for the inner cube
 	}                                                    
     // Calculate view-space coordinate								
     vec4 P = mv_matrix * position;	
 	// Calculate normal in view space
     vec4 N = mv_matrix * adjustedNormal;
 	// Calculate view-space light vector
-    vec3 L = light_pos - P.xyz;
+    vec3 L = light_pos.xyz - P.xyz;
 	// Calculate view vector (simply the negative of the view-space position)
     vec3 V = -P.xyz;
 
