@@ -15,8 +15,8 @@ layout (std140) uniform constants
 	mat4 proj_matrix;												
 	vec4 uni_color;		
 	vec4 light_pos;									     		
-	bool useUniformColor;	
-	bool invertNormals;
+	vec4 useUniformColor;	
+	vec4 invertNormals;
 };
 
 // Outputs to Fragment Shader
@@ -31,7 +31,7 @@ out VS_OUT
 void main(void)
 {
 	vec3 adjustedNormal = normal;
-	if (invertNormals) 
+	if (invertNormals.x == 1.0) 
 	{
 	   adjustedNormal = -normal; //invert normals for the inner cube
 	}        
@@ -50,11 +50,12 @@ void main(void)
 
 	vs_out.color = attributeColor.xyz;
 
-	if (useUniformColor)								
-    {                               							
-       vs_out.color = uni_color.xyz;		
+	if (useUniformColor.x == 1)								
+    {                               				
+      vs_out.color = uni_color.xyz;		
 	}    
 
+	vs_out.color = normal;
 
     // Calculate the clip-space position of each vertex
     gl_Position = proj_matrix * P;

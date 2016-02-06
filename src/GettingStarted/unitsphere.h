@@ -6,11 +6,14 @@
 //
 //------------------------------------------------------------------------------------------
 
-#include <QOpenGLWidget>
-#include <QList>
-#include <QVector3D>
-#include <QVector2D>
-#include <math.h>
+#include <sb7.h>
+#include <vmath.h>
+#include <object.h>
+#include <sb7ktx.h>
+#include <shader.h>
+#include <assert.h>
+#include <cmath>
+#include <cmath>
 
 #ifndef UVSPHERE_H
 #define UVSPHERE_H
@@ -42,9 +45,9 @@ public:
 private:
     void clearData();
 
-    QList<QVector3D> verticesList;
-    QList<QVector2D> texCoordList;
-    QList<QVector3D> normalsList;
+    list<vmath::vec3> verticesList;
+    QList<vmath::vec3> texCoordList;
+    QList<vmath::vec3> normalsList;
     QVector<GLushort> indicesList;
     GLfloat* vertices;
     GLfloat* texCoord;

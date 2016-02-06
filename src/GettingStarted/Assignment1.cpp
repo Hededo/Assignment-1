@@ -7,6 +7,8 @@
 #include <assert.h>
 #include <cmath>
 
+#include <vector>
+
 #define PI 3.14159265
 #define MANY_OBJECTS 1
 #undef MANY_OBJECTS
@@ -37,6 +39,8 @@ protected:
 
     void startup();
     void render(double currentTime);
+	void triangle(vmath::vec3 a, vmath::vec3 b, vmath::vec3 c);
+	void insertVec3IntoBuffer(vmath::vec3 toInsert, int bufferId);
 
 	//Listener
     void onKey(int key, int action);
@@ -65,8 +69,8 @@ protected:
         vmath::mat4     proj_matrix;
 		vmath::vec4     uni_color;
 		vmath::vec4     lightPos;
-		bool	        useUniformColor;
-		bool	        invertNormals;
+		vmath::vec4	    useUniformColor;
+		vmath::vec4	    invertNormals;
     };
 
     GLuint          uniforms_buffer;
@@ -74,7 +78,7 @@ protected:
 	sb7::object     object;
 
 	bool            per_vertex;
-	bool            useUniformColor;
+	vmath::vec4     useUniformColor;
 
 
 	// Variables for mouse interaction
@@ -98,6 +102,8 @@ protected:
 	const vmath::vec4 orange = vmath::vec4(1.0f, 0.5f, 0.0f, 1.0f);
 	const vmath::vec4 purple = vmath::vec4(1.0f, 0.0f, 1.0f, 1.0f);
 	const vmath::vec4 gray = vmath::vec4(0.8f, 0.8f, 0.8f, 1.0f);
+	const vmath::vec4 falseVec = vmath::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+	const vmath::vec4 trueVec = vmath::vec4(1.0f, 1.0f, 1.0f, 1.0f);
     #pragma endregion
 
 #pragma region Vertex Data
@@ -273,6 +279,12 @@ protected:
 		0.0f, 1.0f, 0.0f, 1.0f,
 		//End Cube
 	};
+
+	std::vector<GLfloat> sphereData = std::vector<GLfloat>();
+	std::vector<GLfloat> sphereColors = std::vector<GLfloat>();
+	std::vector<GLfloat> sphereNormals = std::vector<GLfloat>();
+	int sphereVertexCount = 0;
+
 #pragma endregion
 
 #pragma endregion
@@ -306,6 +318,34 @@ private:
 	GLuint sphere_vao;
 #pragma endregion
 };
+
+// ------------- Helper Functions -------------
+// ---------------------------------------------
+
+void assignment1_app::triangle(vmath::vec3 a, vmath::vec3 b, vmath::vec3 c) {
+
+	vmath::vec3 t1 = a - b;
+	vmath::vec3 t2 = a - c;
+	vmath::vec3 normal = vmath::normalize(vmath::cross(t1, t2));
+	normal = vmath::vec3(normal);
+
+	/*normalsArray.push(normal);
+	normalsArray.push(normal);
+	normalsArray.push(normal);*/
+
+	/*pointsArray.push(a);
+	pointsArray.push(b);
+	pointsArray.push(c);*/
+
+	sphereData.push_back(a[0]);
+
+
+
+	sphereVertexCount += 3;
+}
+
+
+
 
 void assignment1_app::startup()
 {
@@ -350,7 +390,7 @@ void assignment1_app::startup()
     glBufferData(GL_UNIFORM_BUFFER, sizeof(uniforms_block), NULL, GL_DYNAMIC_DRAW);
     #pragma endregion
 
-	useUniformColor = false;
+	useUniformColor = falseVec;
 
 	glGenVertexArrays(1, &sphere_vao);
 	glBindVertexArray(sphere_vao);
@@ -437,8 +477,6 @@ void assignment1_app::render(double currentTime)
 	view_matrix *= rotationMatrix;
 
 	vmath::mat4 perspective_matrix = vmath::perspective(50.0f, (float)info.windowWidth / (float)info.windowHeight, 0.1f, 1000.0f);
-
-	// Render cube
 	
 	glUnmapBuffer(GL_UNIFORM_BUFFER); //release the mapping of a buffer object's data store into the client's address space
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
@@ -469,12 +507,12 @@ void assignment1_app::render(double currentTime)
 	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
 	vmath::mat4 model_matrix = 
 		vmath::translate(0.0f, 0.0f, 0.0f) *
-		vmath::scale(1.0f);
+		vmath::scale(5.0f);
 	block->uni_color = purple;
 	block->mv_matrix = view_matrix * model_matrix;
 	block->view_matrix = view_matrix;
 	block->useUniformColor = useUniformColor;
-	block->invertNormals = false;
+	block->invertNormals = falseVec;
 
 	glUnmapBuffer(GL_UNIFORM_BUFFER);
 
@@ -484,46 +522,47 @@ void assignment1_app::render(double currentTime)
 
 #pragma region Uniforms that remain constant for cubes
 	block->uni_color = orange;
-	block->useUniformColor = false;
+	block->useUniformColor = falseVec;
 #pragma endregion
 
+	////bind cube vertex data
 	glBindVertexArray(cube_vao);
 	glUnmapBuffer(GL_UNIFORM_BUFFER);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
 
-   #pragma region Draw Room
+ //  #pragma region Draw Room
 
-	model_matrix =
-		//vmath::rotate((float)currentTime * 14.5f, 0.0f, 1.0f, 0.0f) *
-		vmath::rotate(45.0f, 0.0f, 1.0f, 0.0f)*
-		vmath::scale(22.0f);
+	//model_matrix =
+	//	//vmath::rotate((float)currentTime * 14.5f, 0.0f, 1.0f, 0.0f) *
+	//	vmath::rotate(45.0f, 0.0f, 1.0f, 0.0f)*
+	//	vmath::scale(22.0f);
 
-	block->mv_matrix = view_matrix * model_matrix;
-	block->view_matrix = view_matrix;
-	block->invertNormals = false;
-	
-	glCullFace(GL_FRONT);
-	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
+	//block->mv_matrix = view_matrix * model_matrix;
+	//block->view_matrix = view_matrix;
+	//block->invertNormals = falseVec;
+	//
+	//glCullFace(GL_FRONT);
+	//glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
 
-	#pragma endregion
+	//#pragma endregion
 
-    #pragma region Draw Cube
-	glUnmapBuffer(GL_UNIFORM_BUFFER); //release the mapping of a buffer object's data store into the client's address space
-	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
-	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
+ //   #pragma region Draw Cube
+	//glUnmapBuffer(GL_UNIFORM_BUFFER); //release the mapping of a buffer object's data store into the client's address space
+	//glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
+	//block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
 
-	model_matrix =
-		vmath::rotate(0.0f, 0.0f, 1.0f, 0.0f) *
-		vmath::translate(10.0f, -17.5f, -1.0f) *
-		vmath::scale(5.0f);
+	//model_matrix =
+	//	vmath::rotate(0.0f, 0.0f, 1.0f, 0.0f) *
+	//	vmath::translate(10.0f, -17.5f, -1.0f) *
+	//	vmath::scale(5.0f);
 
-	block->mv_matrix =  view_matrix * model_matrix;
-	block->view_matrix = view_matrix;
-	block->invertNormals = true;
+	//block->mv_matrix =  view_matrix * model_matrix;
+	//block->view_matrix = view_matrix;
+	//block->invertNormals = trueVec;
 
-	glCullFace(GL_BACK);
-	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
-    #pragma endregion
+	//glCullFace(GL_BACK);
+	//glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
+ //   #pragma endregion
 }
 
 void assignment1_app::load_shaders()
@@ -585,7 +624,14 @@ void assignment1_app::onKey(int key, int action)
 				break;
 			case 'C':
 				// Provide a ‘C’ key to switch between colors in the vertex attribute to a constant color for shading the sphere.
-				useUniformColor = !useUniformColor;
+				if (useUniformColor[0] == 1) 
+				{
+					useUniformColor = falseVec;
+				}
+				else
+				{
+					useUniformColor = trueVec;
+				}
 				break;
 		}
     }

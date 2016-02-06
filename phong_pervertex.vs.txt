@@ -12,8 +12,8 @@ layout(std140) uniform constants
 	mat4 proj_matrix;												
 	vec4 uni_color;		
 	vec4 light_pos;									     		
-	bool useUniformColor;
-	bool invertNormals;								     
+	vec4 useUniformColor;
+	vec4 invertNormals;								     
 };		
 
 // Light and material properties
@@ -31,7 +31,7 @@ out VS_OUT
 void main(void)                                                    
 {    
     vec4 adjustedNormal = normal;
-	if (invertNormals) 
+	if (invertNormals.x == 1) 
 	{
 	   adjustedNormal = -normal; //invert normals for the inner cube
 	}                                                    
@@ -58,7 +58,7 @@ void main(void)
 	// Send output color to fragment shader
 	vs_out.color = (ambient + diffuse + specular)*attributeColor.xyz;
 							
-    if (useUniformColor)								
+    if (useUniformColor.x == 1)								
     {                               							
        vs_out.color = (ambient + diffuse + specular)*uni_color.xyz;		
 	}                           									           

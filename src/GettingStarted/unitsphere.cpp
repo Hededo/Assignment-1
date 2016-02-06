@@ -8,9 +8,8 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include "unitsphere.h"
+#include <vmath.h>
 
-#include <QMatrix4x4>
-#include <QVector2D>
 
 UnitSphere::UnitSphere():
     vertices(NULL),
@@ -32,8 +31,8 @@ void UnitSphere::generateSphere(int _numStacks, int _numSlices)
     numSlices = _numSlices;
 
     clearData();
-    QVector3D vertex;
-    QVector2D tex;
+    vmath::vec3 vertex;
+    vmath::vec2 tex;
 
     for (int j = 0; j <= _numStacks; ++j)
     {
@@ -47,17 +46,17 @@ void UnitSphere::generateSphere(int _numStacks, int _numSlices)
             float sinPhi = sin(phi);
             float cosPhi = cos(phi);
 
-            vertex.setX(cosPhi * sinTheta);
-            vertex.setY(cosTheta);
-            vertex.setZ(sinPhi * sinTheta);
+            vertex[0] = (cosPhi * sinTheta);
+            vertex[1] = (cosTheta);
+            vertex[2] = (sinPhi * sinTheta);
             verticesList.append(vertex);
 
             // normal at this point is the same value with coordinate
             normalsList.append(vertex);
 
 
-            tex.setX(1.0 - (float)i / (float) _numSlices);
-            tex.setY(1.0 - (float)j / (float) _numStacks);
+            tex[0] = (1.0 - (float)i / (float) _numSlices);
+            tex[1] = (1.0 - (float)j / (float) _numStacks);
             texCoordList.append(tex);
         }
     }
@@ -121,10 +120,10 @@ GLfloat* UnitSphere::getVertices()
 
         for(int i = 0; i < verticesList.size(); ++i)
         {
-            QVector3D vertex = verticesList.at(i);
-            vertices[3 * i] = vertex.x();
-            vertices[3 * i + 1] = vertex.y();
-            vertices[3 * i + 2] = vertex.z();
+            vmath::vec3 vertex = verticesList.at(i);
+            vertices[3 * i] = vertex[0];
+            vertices[3 * i + 1] = vertex[1];
+            vertices[3 * i + 2] = vertex[2];
 //            qDebug() << i << vertex;
         }
 
@@ -142,10 +141,10 @@ GLfloat* UnitSphere::getNormals()
 
         for(int i = 0; i < normalsList.size(); ++i)
         {
-            QVector3D normal = normalsList.at(i);
-            normals[3 * i] = normal.x();
-            normals[3 * i + 1] = normal.y();
-            normals[3 * i + 2] = normal.z();
+            vmath::vec3 normal = normalsList.at(i);
+            normals[3 * i] = normal[0];
+            normals[3 * i + 1] = normal[1];
+            normals[3 * i + 2] = normal[2];
         }
 
     }
@@ -163,10 +162,10 @@ GLfloat* UnitSphere::getNegativeNormals()
 
     for(int i = 0; i < normalsList.size(); ++i)
     {
-        QVector3D normal = normalsList.at(i);
-        normals[3 * i] = -normal.x();
-        normals[3 * i + 1] = -normal.y();
-        normals[3 * i + 2] = -normal.z();
+        vmath::vec3 normal = normalsList.at(i);
+        normals[3 * i] = -normal[0];
+        normals[3 * i + 1] = -normal[1];
+        normals[3 * i + 2] = -normal[2];
     }
 
 
@@ -183,9 +182,9 @@ GLfloat* UnitSphere::getTexureCoordinates()
 
         for(int i = 0; i < texCoordList.size(); ++i)
         {
-            QVector2D tex = texCoordList.at(i);
-            texCoord[2 * i] = tex.x();
-            texCoord[2 * i + 1] = tex.y();
+            vmath::vec2 tex = texCoordList.at(i);
+            texCoord[2 * i] = tex[0];
+            texCoord[2 * i + 1] = tex[1];
         }
 
     }
