@@ -10,8 +10,9 @@
 #include <vector>
 
 #define PI 3.14159265
-#define MANY_OBJECTS 1
-#undef MANY_OBJECTS
+#define SPHERE_DATA_ID 0
+#define SPHERE_COLORS_ID 1
+#define SPHERE_NORMALS_ID 2
 
 class assignment1_app : public sb7::application
 {
@@ -280,12 +281,12 @@ protected:
 		//End Cube
 	};
 
+#pragma endregion
+
 	std::vector<GLfloat> sphereData = std::vector<GLfloat>();
 	std::vector<GLfloat> sphereColors = std::vector<GLfloat>();
 	std::vector<GLfloat> sphereNormals = std::vector<GLfloat>();
 	int sphereVertexCount = 0;
-
-#pragma endregion
 
 #pragma endregion
 
@@ -320,6 +321,15 @@ private:
 };
 
 // ------------- Helper Functions -------------
+
+vmath::vec3 randomColorVec3()
+{
+	float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	float g = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	float b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	return vmath::vec3(r, g, b);
+}
+
 // ---------------------------------------------
 
 void assignment1_app::triangle(vmath::vec3 a, vmath::vec3 b, vmath::vec3 c) {
@@ -328,20 +338,39 @@ void assignment1_app::triangle(vmath::vec3 a, vmath::vec3 b, vmath::vec3 c) {
 	vmath::vec3 t2 = a - c;
 	vmath::vec3 normal = vmath::normalize(vmath::cross(t1, t2));
 	normal = vmath::vec3(normal);
+	vmath::vec3 color = randomColorVec3();
 
-	/*normalsArray.push(normal);
-	normalsArray.push(normal);
-	normalsArray.push(normal);*/
+	insertVec3IntoBuffer(a, SPHERE_DATA_ID);
+	insertVec3IntoBuffer(b, SPHERE_DATA_ID);
+	insertVec3IntoBuffer(c, SPHERE_DATA_ID);
 
-	/*pointsArray.push(a);
-	pointsArray.push(b);
-	pointsArray.push(c);*/
+	insertVec3IntoBuffer(normal, SPHERE_NORMALS_ID);
+	insertVec3IntoBuffer(normal, SPHERE_NORMALS_ID);
+	insertVec3IntoBuffer(normal, SPHERE_NORMALS_ID);
 
-	sphereData.push_back(a[0]);
+	insertVec3IntoBuffer(color, SPHERE_COLORS_ID);
+	insertVec3IntoBuffer(color, SPHERE_COLORS_ID);
+	insertVec3IntoBuffer(color, SPHERE_COLORS_ID);
 
+	sphereVertexCount += 3; // number of Vertices * x,y,z,w
+}
 
+void assignment1_app::insertVec3IntoBuffer(vmath::vec3 toInsert, int bufferId)
+{
+	switch (bufferId)
+	{
+	case SPHERE_DATA_ID:
+		break;
 
-	sphereVertexCount += 3;
+	case SPHERE_COLORS_ID:
+		break;
+
+	case SPHERE_NORMALS_ID:
+		break;
+
+	default:
+		break;
+	}
 }
 
 
@@ -499,7 +528,7 @@ void assignment1_app::render(double currentTime)
 	block->lightPos = lightPos;
     #pragma endregion
 
-    #pragma region Draw Sphere
+   /* #pragma region Draw Sphere
 	glBindVertexArray(sphere_vao);
 	glUnmapBuffer(GL_UNIFORM_BUFFER);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
@@ -518,7 +547,7 @@ void assignment1_app::render(double currentTime)
 
 	glCullFace(GL_BACK);
 	object.render();
-#pragma endregion
+#pragma endregion*/
 
 #pragma region Uniforms that remain constant for cubes
 	block->uni_color = orange;
@@ -529,40 +558,41 @@ void assignment1_app::render(double currentTime)
 	glBindVertexArray(cube_vao);
 	glUnmapBuffer(GL_UNIFORM_BUFFER);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
+	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
 
- //  #pragma region Draw Room
+   #pragma region Draw Room
 
-	//model_matrix =
-	//	//vmath::rotate((float)currentTime * 14.5f, 0.0f, 1.0f, 0.0f) *
-	//	vmath::rotate(45.0f, 0.0f, 1.0f, 0.0f)*
-	//	vmath::scale(22.0f);
+	vmath::mat4 model_matrix =
+		//vmath::rotate((float)currentTime * 14.5f, 0.0f, 1.0f, 0.0f) *
+		vmath::rotate(45.0f, 0.0f, 1.0f, 0.0f)*
+		vmath::scale(22.0f);
 
-	//block->mv_matrix = view_matrix * model_matrix;
-	//block->view_matrix = view_matrix;
-	//block->invertNormals = falseVec;
-	//
-	//glCullFace(GL_FRONT);
-	//glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
+	block->mv_matrix = view_matrix * model_matrix;
+	block->view_matrix = view_matrix;
+	block->invertNormals = falseVec;
+	
+	glCullFace(GL_FRONT);
+	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
 
-	//#pragma endregion
+	#pragma endregion
 
- //   #pragma region Draw Cube
-	//glUnmapBuffer(GL_UNIFORM_BUFFER); //release the mapping of a buffer object's data store into the client's address space
-	//glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
-	//block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
+    #pragma region Draw Cube
+	glUnmapBuffer(GL_UNIFORM_BUFFER); //release the mapping of a buffer object's data store into the client's address space
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
+	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
 
-	//model_matrix =
-	//	vmath::rotate(0.0f, 0.0f, 1.0f, 0.0f) *
-	//	vmath::translate(10.0f, -17.5f, -1.0f) *
-	//	vmath::scale(5.0f);
+	model_matrix =
+		vmath::rotate(0.0f, 0.0f, 1.0f, 0.0f) *
+		vmath::translate(10.0f, -17.5f, -1.0f) *
+		vmath::scale(5.0f);
 
-	//block->mv_matrix =  view_matrix * model_matrix;
-	//block->view_matrix = view_matrix;
-	//block->invertNormals = trueVec;
+	block->mv_matrix =  view_matrix * model_matrix;
+	block->view_matrix = view_matrix;
+	block->invertNormals = trueVec;
 
-	//glCullFace(GL_BACK);
-	//glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
- //   #pragma endregion
+	glCullFace(GL_BACK);
+	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
+    #pragma endregion
 }
 
 void assignment1_app::load_shaders()

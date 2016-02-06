@@ -55,8 +55,6 @@ void main(void)
       vs_out.color = uni_color.xyz;		
 	}    
 
-	vs_out.color = normal;
-
     // Calculate the clip-space position of each vertex
     gl_Position = proj_matrix * P;
 }

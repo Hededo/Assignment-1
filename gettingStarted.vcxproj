@@ -275,6 +275,9 @@
     <Text Include="phong_pervertex.fs.txt" />
     <Text Include="phong_pervertex.vs.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="turtle.js" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

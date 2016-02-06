@@ -1,1 +1,22 @@
-﻿  gettingStarted.vcxproj -> C:\VersionedCode\Skoo\bin\gettingStarted_d.exe
+﻿  Assignment1.cpp
+D:\Local Docs\Code\CS 5610\Skoo\include\vmath.h(1022): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+LINK : warning LNK4076: invalid incremental status file 'bin\gettingStarted_d.ilk' (which will be deleted); linking nonincrementally
+sb7_d.lib(sb7.obj) : warning LNK4099: PDB 'sb7.pdb' was not found with 'sb7_d.lib(sb7.obj)' or at 'D:\Local Docs\Code\CS 5610\Skoo\bin\sb7.pdb'; linking object as if no debug info
+sb7_d.lib(sb7object.obj) : warning LNK4099: PDB 'sb7.pdb' was not found with 'sb7_d.lib(sb7object.obj)' or at 'D:\Local Docs\Code\CS 5610\Skoo\bin\sb7.pdb'; linking object as if no debug info
+sb7_d.lib(sb7shader.obj) : warning LNK4099: PDB 'sb7.pdb' was not found with 'sb7_d.lib(sb7shader.obj)' or at 'D:\Local Docs\Code\CS 5610\Skoo\bin\sb7.pdb'; linking object as if no debug info
+sb7_d.lib(gl3w.obj) : warning LNK4099: PDB 'sb7.pdb' was not found with 'sb7_d.lib(gl3w.obj)' or at 'D:\Local Docs\Code\CS 5610\Skoo\bin\sb7.pdb'; linking object as if no debug info
+glfw3_d.lib(context.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'glfw3_d.lib(context.obj)' or at 'D:\Local Docs\Code\CS 5610\Skoo\bin\glfw.pdb'; linking object as if no debug info
+glfw3_d.lib(gamma.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'glfw3_d.lib(gamma.obj)' or at 'D:\Local Docs\Code\CS 5610\Skoo\bin\glfw.pdb'; linking object as if no debug info
+glfw3_d.lib(init.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'glfw3_d.lib(init.obj)' or at 'D:\Local Docs\Code\CS 5610\Skoo\bin\glfw.pdb'; linking object as if no debug info
+glfw3_d.lib(input.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'glfw3_d.lib(input.obj)' or at 'D:\Local Docs\Code\CS 5610\Skoo\bin\glfw.pdb'; linking object as if no debug info
+glfw3_d.lib(monitor.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'glfw3_d.lib(monitor.obj)' or at 'D:\Local Docs\Code\CS 5610\Skoo\bin\glfw.pdb'; linking object as if no debug info
+glfw3_d.lib(time.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'glfw3_d.lib(time.obj)' or at 'D:\Local Docs\Code\CS 5610\Skoo\bin\glfw.pdb'; linking object as if no debug info
+glfw3_d.lib(window.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'glfw3_d.lib(window.obj)' or at 'D:\Local Docs\Code\CS 5610\Skoo\bin\glfw.pdb'; linking object as if no debug info
+glfw3_d.lib(win32_gamma.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'glfw3_d.lib(win32_gamma.obj)' or at 'D:\Local Docs\Code\CS 5610\Skoo\bin\glfw.pdb'; linking object as if no debug info
+glfw3_d.lib(win32_init.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'glfw3_d.lib(win32_init.obj)' or at 'D:\Local Docs\Code\CS 5610\Skoo\bin\glfw.pdb'; linking object as if no debug info
+glfw3_d.lib(win32_joystick.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'glfw3_d.lib(win32_joystick.obj)' or at 'D:\Local Docs\Code\CS 5610\Skoo\bin\glfw.pdb'; linking object as if no debug info
+glfw3_d.lib(win32_monitor.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'glfw3_d.lib(win32_monitor.obj)' or at 'D:\Local Docs\Code\CS 5610\Skoo\bin\glfw.pdb'; linking object as if no debug info
+glfw3_d.lib(win32_time.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'glfw3_d.lib(win32_time.obj)' or at 'D:\Local Docs\Code\CS 5610\Skoo\bin\glfw.pdb'; linking object as if no debug info
+glfw3_d.lib(win32_window.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'glfw3_d.lib(win32_window.obj)' or at 'D:\Local Docs\Code\CS 5610\Skoo\bin\glfw.pdb'; linking object as if no debug info
+glfw3_d.lib(wgl_context.obj) : warning LNK4099: PDB 'glfw.pdb' was not found with 'glfw3_d.lib(wgl_context.obj)' or at 'D:\Local Docs\Code\CS 5610\Skoo\bin\glfw.pdb'; linking object as if no debug info
+  gettingStarted.vcxproj -> D:\Local Docs\Code\CS 5610\Skoo\bin\gettingStarted_d.exe
