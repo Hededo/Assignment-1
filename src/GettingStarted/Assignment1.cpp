@@ -40,8 +40,10 @@ protected:
 
     void startup();
     void render(double currentTime);
-	void triangle(vmath::vec3 a, vmath::vec3 b, vmath::vec3 c);
-	void insertVec3IntoBuffer(vmath::vec3 toInsert, int bufferId);
+	void triangle(vmath::vec4 a, vmath::vec4 b, vmath::vec4 c);
+	void insertVec4IntoBuffer(vmath::vec4 toInsert, int bufferId);
+	void divideTriangle(vmath::vec4 a, vmath::vec4 b, vmath::vec4 c, int count);
+	void tetrahedron(vmath::vec4, vmath::vec4 b, vmath::vec4, vmath::vec4 d, int n);
 
 	//Listener
     void onKey(int key, int action);
@@ -75,8 +77,6 @@ protected:
     };
 
     GLuint          uniforms_buffer;
-
-	sb7::object     object;
 
 	bool            per_vertex;
 	vmath::vec4     useUniformColor;
@@ -286,7 +286,7 @@ protected:
 	std::vector<GLfloat> sphereData = std::vector<GLfloat>();
 	std::vector<GLfloat> sphereColors = std::vector<GLfloat>();
 	std::vector<GLfloat> sphereNormals = std::vector<GLfloat>();
-	int sphereVertexCount = 0;
+	GLuint sphereVertexCount = 0;
 
 #pragma endregion
 
@@ -312,60 +312,96 @@ private:
 	float iLightPosZ = 0.0f;
 	vmath::vec4 lightPos = vmath::vec4(iLightPosX, iLightPosY, iLightPosZ, 1.0f);
 
-	GLuint buffer;
-	GLuint colorBuffer;
-	GLuint normalsBuffer;
+	GLuint cubePosBuffer;
+	GLuint cubeColorBuffer;
+	GLuint cubeNormalsBuffer;
 	GLuint cube_vao;
+
+	GLuint sphereBufferSize = 0;
+	GLuint spherePosBuffer;
+	GLuint sphereColorBuffer;
+	GLuint sphereNormalsBuffer;
 	GLuint sphere_vao;
 #pragma endregion
 };
 
 // ------------- Helper Functions -------------
 
-vmath::vec3 randomColorVec3()
+vmath::vec4 randomColorVec4()
 {
 	float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 	float g = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 	float b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-	return vmath::vec3(r, g, b);
+	float a = 1.0f;
+	return vmath::vec4(r, g, b, a);
 }
 
 // ---------------------------------------------
 
-void assignment1_app::triangle(vmath::vec3 a, vmath::vec3 b, vmath::vec3 c) {
+void assignment1_app::triangle(vmath::vec4 a, vmath::vec4 b, vmath::vec4 c) {
 
-	vmath::vec3 t1 = a - b;
-	vmath::vec3 t2 = a - c;
-	vmath::vec3 normal = vmath::normalize(vmath::cross(t1, t2));
-	normal = vmath::vec3(normal);
-	vmath::vec3 color = randomColorVec3();
+	//unable to cross vec4s. Solution is to make temp vec3 of a,b,c
+	vmath::vec3 ta = vmath::vec3(a[0], a[1], a[2]);
+	vmath::vec3 tb = vmath::vec3(b[0], b[1], b[2]);
+	vmath::vec3 tc = vmath::vec3(c[0], c[1], c[2]);
 
-	insertVec3IntoBuffer(a, SPHERE_DATA_ID);
-	insertVec3IntoBuffer(b, SPHERE_DATA_ID);
-	insertVec3IntoBuffer(c, SPHERE_DATA_ID);
+	vmath::vec3 t1 = ta - tb;
+	vmath::vec3 t2 = ta - tc;
 
-	insertVec3IntoBuffer(normal, SPHERE_NORMALS_ID);
-	insertVec3IntoBuffer(normal, SPHERE_NORMALS_ID);
-	insertVec3IntoBuffer(normal, SPHERE_NORMALS_ID);
+	vmath::vec3 normalVec3 = vmath::normalize(vmath::cross(t1, t2));
+	vmath::vec4 normal = vmath::vec4(normalVec3[0], normalVec3[1], normalVec3[2], 1.0f);
+	vmath::vec4 color = randomColorVec4();
 
-	insertVec3IntoBuffer(color, SPHERE_COLORS_ID);
-	insertVec3IntoBuffer(color, SPHERE_COLORS_ID);
-	insertVec3IntoBuffer(color, SPHERE_COLORS_ID);
+	insertVec4IntoBuffer(a, SPHERE_DATA_ID);
+	insertVec4IntoBuffer(b, SPHERE_DATA_ID);
+	insertVec4IntoBuffer(c, SPHERE_DATA_ID);
+
+	insertVec4IntoBuffer(normal, SPHERE_NORMALS_ID);
+	insertVec4IntoBuffer(normal, SPHERE_NORMALS_ID);
+	insertVec4IntoBuffer(normal, SPHERE_NORMALS_ID);
+
+	insertVec4IntoBuffer(color, SPHERE_COLORS_ID);
+	insertVec4IntoBuffer(color, SPHERE_COLORS_ID);
+	insertVec4IntoBuffer(color, SPHERE_COLORS_ID);
 
 	sphereVertexCount += 3; // number of Vertices * x,y,z,w
 }
 
-void assignment1_app::insertVec3IntoBuffer(vmath::vec3 toInsert, int bufferId)
+void assignment1_app::insertVec4IntoBuffer(vmath::vec4 toInsert, int bufferId)
 {
+
+	if (toInsert == NULL)
+	{
+		return;
+	}
+
+	GLfloat x = toInsert[0];
+	GLfloat y = toInsert[1];
+	GLfloat z = toInsert[2];
+	GLfloat a = 1.0f;
+
 	switch (bufferId)
 	{
+
 	case SPHERE_DATA_ID:
+		sphereData.push_back(x);
+		sphereData.push_back(y);
+		sphereData.push_back(z);
+		sphereData.push_back(a);
 		break;
 
 	case SPHERE_COLORS_ID:
+		sphereColors.push_back(x);
+		sphereColors.push_back(y);
+		sphereColors.push_back(z);
+		sphereColors.push_back(a);
 		break;
 
 	case SPHERE_NORMALS_ID:
+		sphereNormals.push_back(x);
+		sphereNormals.push_back(y);
+		sphereNormals.push_back(z);
+		sphereNormals.push_back(a);
 		break;
 
 	default:
@@ -373,57 +409,158 @@ void assignment1_app::insertVec3IntoBuffer(vmath::vec3 toInsert, int bufferId)
 	}
 }
 
+/*
+* divideTriangle
+* recursively divides a triangle into
+* smaller triangles
+*
+* Params:
+*  a: a positon of vec4
+*  b: a positon of vec4
+*  c: a positon of vec4
+*  count: number of subdivisons
+*
+* Returns:
+*
+*
+* Modified from shadedSphere3.js
+*/
+void assignment1_app::divideTriangle(vmath::vec4 a, vmath::vec4 b, vmath::vec4 c, int count)
+{
+	if (count > 0) {
 
+		vmath::vec4 ab = vmath::mix(a, b, 0.5);
+		vmath::vec4 ac = vmath::mix(a, c, 0.5);
+		vmath::vec4 bc = vmath::mix(b, c, 0.5);
+
+		ab = vmath::normalize(ab);
+		ac = vmath::normalize(ac);
+		bc = vmath::normalize(bc);
+
+		//reset the x coordinate
+		ab[3] = 1.0f;
+		ac[3] = 1.0f;
+		bc[3] = 1.0f;
+
+		divideTriangle(a, ab, ac, count - 1);
+		divideTriangle(ab, b, bc, count - 1);
+		divideTriangle(bc, c, ac, count - 1);
+		divideTriangle(ab, bc, ac, count - 1);
+	}
+	else {
+		triangle(a, b, c);
+	}
+}
+
+/*
+* tetrahedron
+* constructs a tetrahedron from 4 points and
+* a number of triangle subdivisons
+*
+* Params:
+*  a: a positon of vec4
+*  b: a positon of vec4
+*  c: a positon of vec4
+*  d: a positon of vec4
+*  n: number of subdivisons
+*
+* Returns:
+*
+*
+* Modified from shadedSphere3.js
+*/
+void assignment1_app::tetrahedron(vmath::vec4 a, vmath::vec4 b, vmath::vec4 c, vmath::vec4 d, int n)
+{
+	divideTriangle(a, b, c, n);
+	divideTriangle(d, c, b, n);
+	divideTriangle(a, d, b, n);
+	divideTriangle(a, c, d, n);
+}
 
 
 void assignment1_app::startup()
 {
 	load_shaders();
 
+    #pragma region Setup Cube
 	glGenVertexArrays(1, &cube_vao);  //glGenVertexArrays(n, &array) returns n vertex array object names in arrays
 	glBindVertexArray(cube_vao); //glBindVertexArray(array) binds the vertex array object with name array.
 
-    #pragma region Buffer
-	glGenBuffers(1, &buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glGenBuffers(1, &cubePosBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, cubePosBuffer);
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(cube_data),
 		cube_data,
 		GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-   #pragma endregion
 
-    #pragma region Color Buffer
-	glGenBuffers(1, &colorBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+	glGenBuffers(1, &cubeColorBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, cubeColorBuffer);
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(color_data),
 		color_data,
 		GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-#pragma endregion
 
-    #pragma region Normals Buffer
-	glGenBuffers(1, &normalsBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, normalsBuffer);
+	glGenBuffers(1, &cubeNormalsBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, cubeNormalsBuffer);
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(normals_data),
 		normals_data,
 		GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-#pragma endregion
 	
-    #pragma region Buffer For Uniform Block
 	glGenBuffers(1, &uniforms_buffer);
     glBindBuffer(GL_UNIFORM_BUFFER, uniforms_buffer);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(uniforms_block), NULL, GL_DYNAMIC_DRAW);
-    #pragma endregion
+#pragma endregion
 
-	useUniformColor = falseVec;
+    #pragma region Setup Sphere
+
+	std::vector<vmath::vec4> points = {
+		vmath::vec4(0.0f, 0.0f, -1.0f, 1.0f),
+		vmath::vec4(0.0f, 0.942809f, 0.333333f, 1.0f),
+		vmath::vec4(-0.816497f, -0.471405f, 0.333333f, 1.0f),
+		vmath::vec4(0.816497f, -0.471405f, 0.333333f , 1.0f),
+	};
+
+	tetrahedron(points[0], points[1], points[2], points[3], 1);
+
+	sphereBufferSize = sphereData.size() * 4 * sizeof(GLfloat);
 
 	glGenVertexArrays(1, &sphere_vao);
 	glBindVertexArray(sphere_vao);
-	object.load("bin\\media\\objects\\sphere.sbm");
+
+	glGenBuffers(1, &spherePosBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, spherePosBuffer);
+	glBufferData(GL_ARRAY_BUFFER,
+		sphereBufferSize,
+		&sphereData[0],
+		GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glGenBuffers(1, &sphereColorBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, sphereColorBuffer);
+	glBufferData(GL_ARRAY_BUFFER,
+		sphereBufferSize,
+		&sphereColors[0],
+		GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glGenBuffers(1, &sphereNormalsBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, sphereNormalsBuffer);
+	glBufferData(GL_ARRAY_BUFFER,
+		sphereBufferSize,
+		&sphereNormals[0],
+		GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glGenBuffers(1, &uniforms_buffer);
+	glBindBuffer(GL_UNIFORM_BUFFER, uniforms_buffer);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(uniforms_block), NULL, GL_DYNAMIC_DRAW);
+    #pragma endregion
+
+	useUniformColor = falseVec;
 
 #pragma region OPENGL Settings
 
@@ -511,24 +648,24 @@ void assignment1_app::render(double currentTime)
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
 	uniforms_block * block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
-	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glEnableVertexAttribArray(0); //enable or disable a generic vertex attribute array
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
-
-	glBindBuffer(GL_ARRAY_BUFFER, normalsBuffer);
-	glEnableVertexAttribArray(1); //enable or disable a generic vertex attribute array
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
-
-	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-	glEnableVertexAttribArray(2); //enable or disable a generic vertex attribute array
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
-
     #pragma region Uniforms that remain constant for all geometery
 	block->proj_matrix = perspective_matrix;
 	block->lightPos = lightPos;
     #pragma endregion
 
-   /* #pragma region Draw Sphere
+	glBindBuffer(GL_ARRAY_BUFFER, spherePosBuffer);
+	glEnableVertexAttribArray(0); //enable or disable a generic vertex attribute array
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
+
+	glBindBuffer(GL_ARRAY_BUFFER, sphereNormalsBuffer);
+	glEnableVertexAttribArray(1); //enable or disable a generic vertex attribute array
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
+
+	glBindBuffer(GL_ARRAY_BUFFER, sphereColorBuffer);
+	glEnableVertexAttribArray(2); //enable or disable a generic vertex attribute array
+	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
+
+    #pragma region Draw Sphere
 	glBindVertexArray(sphere_vao);
 	glUnmapBuffer(GL_UNIFORM_BUFFER);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
@@ -543,56 +680,66 @@ void assignment1_app::render(double currentTime)
 	block->useUniformColor = useUniformColor;
 	block->invertNormals = falseVec;
 
-	glUnmapBuffer(GL_UNIFORM_BUFFER);
-
 	glCullFace(GL_BACK);
-	object.render();
-#pragma endregion*/
-
-#pragma region Uniforms that remain constant for cubes
-	block->uni_color = orange;
-	block->useUniformColor = falseVec;
+	glDrawArrays(GL_TRIANGLES, 0, sphereVertexCount);
 #pragma endregion
 
-	////bind cube vertex data
-	glBindVertexArray(cube_vao);
-	glUnmapBuffer(GL_UNIFORM_BUFFER);
-	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
-	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
-
-   #pragma region Draw Room
-
-	vmath::mat4 model_matrix =
-		//vmath::rotate((float)currentTime * 14.5f, 0.0f, 1.0f, 0.0f) *
-		vmath::rotate(45.0f, 0.0f, 1.0f, 0.0f)*
-		vmath::scale(22.0f);
-
-	block->mv_matrix = view_matrix * model_matrix;
-	block->view_matrix = view_matrix;
-	block->invertNormals = falseVec;
-	
-	glCullFace(GL_FRONT);
-	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
-
-	#pragma endregion
-
-    #pragma region Draw Cube
-	glUnmapBuffer(GL_UNIFORM_BUFFER); //release the mapping of a buffer object's data store into the client's address space
-	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
-	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
-
-	model_matrix =
-		vmath::rotate(0.0f, 0.0f, 1.0f, 0.0f) *
-		vmath::translate(10.0f, -17.5f, -1.0f) *
-		vmath::scale(5.0f);
-
-	block->mv_matrix =  view_matrix * model_matrix;
-	block->view_matrix = view_matrix;
-	block->invertNormals = trueVec;
-
-	glCullFace(GL_BACK);
-	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
-    #pragma endregion
+//	glBindBuffer(GL_ARRAY_BUFFER, cubePosBuffer);
+//	glEnableVertexAttribArray(0); //enable or disable a generic vertex attribute array
+//	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
+//
+//	glBindBuffer(GL_ARRAY_BUFFER, cubeNormalsBuffer);
+//	glEnableVertexAttribArray(1); //enable or disable a generic vertex attribute array
+//	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
+//
+//	glBindBuffer(GL_ARRAY_BUFFER, cubeColorBuffer);
+//	glEnableVertexAttribArray(2); //enable or disable a generic vertex attribute array
+//	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, 0); //define an array of generic vertex attribute data void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid * pointer)
+//
+//#pragma region Uniforms that remain constant for cubes
+//	block->uni_color = orange;
+//	block->useUniformColor = falseVec;
+//#pragma endregion
+//
+//	//bind cube vertex data
+//	glBindVertexArray(cube_vao);
+//	glUnmapBuffer(GL_UNIFORM_BUFFER);
+//	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
+//	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
+//
+//   #pragma region Draw Room
+//
+//	 model_matrix =
+//		//vmath::rotate((float)currentTime * 14.5f, 0.0f, 1.0f, 0.0f) *
+//		vmath::rotate(45.0f, 0.0f, 1.0f, 0.0f)*
+//		vmath::scale(22.0f);
+//
+//	block->mv_matrix = view_matrix * model_matrix;
+//	block->view_matrix = view_matrix;
+//	block->invertNormals = falseVec;
+//	
+//	glCullFace(GL_FRONT);
+//	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
+//
+//	#pragma endregion
+//
+//   #pragma region Draw Cube
+//	glUnmapBuffer(GL_UNIFORM_BUFFER); //release the mapping of a buffer object's data store into the client's address space
+//	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniforms_buffer);
+//	block = (uniforms_block *)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(uniforms_block), GL_MAP_WRITE_BIT);
+//
+//	model_matrix =
+//		vmath::rotate(0.0f, 0.0f, 1.0f, 0.0f) *
+//		vmath::translate(10.0f, -17.5f, -1.0f) *
+//		vmath::scale(5.0f);
+//
+//	block->mv_matrix =  view_matrix * model_matrix;
+//	block->view_matrix = view_matrix;
+//	block->invertNormals = trueVec;
+//
+//	glCullFace(GL_BACK);
+//	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
+//    #pragma endregion
 }
 
 void assignment1_app::load_shaders()
