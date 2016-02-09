@@ -13,7 +13,8 @@ layout(std140) uniform constants
 	vec4 uni_color;		
 	vec4 light_pos;									     		
 	vec4 useUniformColor;
-	vec4 invertNormals;								     
+	vec4 invertNormals;		
+	vec4 isSphere;						     
 };		
 
 // Light and material properties
@@ -56,7 +57,15 @@ void main(void)
 	vec3 specular = pow(max(dot(R, V), 0.0), specular_power) * specular_albedo;
 	
 	// Send output color to fragment shader
-	vs_out.color = (ambient + diffuse + specular)*attributeColor.xyz;
+	if (isSphere.x == 1)								
+    {                               				
+		vs_out.color = (ambient + diffuse + specular)*position.xyz + vec3(0.3,0.3,0.3);		
+	}   
+	else 
+	{
+		vs_out.color = (ambient + diffuse + specular)*attributeColor.xyz;
+	} 
+	
 							
     if (useUniformColor.x == 1)								
     {                               							

@@ -17,6 +17,7 @@ layout (std140) uniform constants
 	vec4 light_pos;									     		
 	vec4 useUniformColor;	
 	vec4 invertNormals;
+	vec4 isSphere;
 };
 
 // Outputs to Fragment Shader
@@ -48,12 +49,20 @@ void main(void)
     // Calculate view vector
     vs_out.V = -P.xyz;
 
-	vs_out.color = attributeColor.xyz;
-
+	if (isSphere.x == 1)								
+    {                               				
+      vs_out.color = position.xyz + vec3(0.3,0.3,0.3);		
+	}   
+	else 
+	{
+		vs_out.color = attributeColor.xyz;
+	} 
+	
 	if (useUniformColor.x == 1)								
     {                               				
       vs_out.color = uni_color.xyz;		
 	}    
+
 
     // Calculate the clip-space position of each vertex
     gl_Position = proj_matrix * P;
